@@ -1,257 +1,168 @@
-<<<<<<< HEAD
 {% extends "layout.html" %}
-{% block content %}
-<div class="container-fluid py-5 px-4">
-  <div class="mb-4 d-flex justify-content-between align-items-center">
-    <div>
-      <h2 class="fw-bold text-primary mb-0">
-        <i class="bi bi-bar-chart-line me-2"></i> Transport Financial Dashboard
-      </h2>
-      <p class="text-muted">Trip Summary Table with Download Option</p>
-    </div>
-    <button class="btn btn-primary" onclick="downloadTableAsCsv()">
-      <i class="bi bi-download me-2"></i> Download as CSV
-    </button>
-  </div>
+{% block title %}Financial Dashboard{% endblock %}
 
-  <!-- Data Table -->
-  <div class="mt-5">
-    <div class="card shadow-sm">
-      <div class="card-header bg-dark text-white fw-semibold">Trip Summary Table</div>
-      <div class="table-responsive">
-        <table id="tripTable" class="table table-hover mb-0 align-middle">
-          <thead class="table-light">
-            <tr>
-              <th>Vehicle</th>
-              <th>Driver</th>
-              <th>Indent Date</th>
-              <th>Pickup</th>
-              <th>Drop</th>
-              <th>Total Km (TpT)</th>
-              <th>Rate</th>
-              <th>Total Cost</th>
-              <th>Total Cost (Loading)</th>
-              <th>Criteria</th>
-              <th>Total Cost (Unload)</th>
-              <th>Any Other Cost</th>
-              <th>Total Cost (Final)</th>
-              <th>Criteria</th>
-              <th>Cost</th>
-              <th>Revenue</th>
-              <th>P & L</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for t in routes %}
-              <tr>
-                <td>{{ t.vehicle_id }}</td>
-                <td>{{ t.driver_name }}</td>
-                <td>{{ t.indent_date }}</td>
-                <td>{{ t.pickup }}</td>
-                <td>{{ t.drop }}</td>
-                <td>{{ t.total_km }}</td>
-                <td>{{ t.rate }}</td>
-                <td>{{ t.total_cost }}</td>
-                <td>{{ t.total_cost_loading }}</td>
-                <td>{{ t.criteria_loading }}</td>
-                <td>{{ t.total_cost_unload }}</td>
-                <td>{{ t.other_cost }}</td>
-                <td>{{ t.final_total_cost }}</td>
-                <td>{{ t.criteria_unload }}</td>
-                <td>{{ t.cost }}</td>
-                <td>{{ t.revenue }}</td>
-                <td>{{ t.pnl }}</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2 class="mb-4 text-danger">Financial Dashboard</h2>
+
+    <!-- ----------------- Top 5 Revenue Vehicles ----------------- -->
+    <div class="row mb-4">
+        {% for vehicle in top_vehicles %}
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card shadow-sm border-0 text-center p-3 h-100"
+                style="background: linear-gradient(135deg, #FFAA33 0%, #ffe066 100%); color: #000;">
+
+                <div class="card-body">
+                    <h5 class="card-title text-truncate">{{ vehicle['Vehicle Name'] }}</h5>
+                    <p class="card-text mb-1"><strong>ID:</strong> {{ vehicle['Vehicle ID'] }}</p>
+                    <p class="card-text mb-1"><strong>Trips:</strong> {{ vehicle['Trips'] }}</p>
+                    <p class="card-text mb-1"><strong>Revenue:</strong> ₹{{ vehicle['Revenue'] | round(2) }}</p>
+                    <p class="card-text mb-1"><strong>Total Distance:</strong> {{ vehicle['Total Distance Travelled'] | round(2) }} km</p>
+                    <div class="revenue-bar bg-danger rounded" style="width: {{ vehicle['Revenue_Percent'] }}%; height: 6px; margin-top:5px;"></div>
+                    <p class="card-text mb-0 {% if vehicle['PnL'] >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        <strong>PnL:</strong> ₹{{ vehicle['PnL'] | round(2) }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-  </div>
+
+    <!-- ----------------- Filter Form ----------------- -->
+    <form class="row g-3 mb-4 p-3 bg-light rounded shadow-sm align-items-end" method="get">
+        <div class="col-md-2">
+            <label class="form-label fw-semibold">Start Date</label>
+            <input type="date" name="start_date" value="{{ start_date }}" class="form-control form-control-lg">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label fw-semibold">End Date</label>
+            <input type="date" name="end_date" value="{{ end_date }}" class="form-control form-control-lg">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Vehicle ID</label>
+            <input type="text" name="vehicle_id" placeholder="Vehicle ID" class="form-control form-control-lg" value="{{ vehicle_filter }}">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Driver Name</label>
+            <input type="text" name="driver_name" placeholder="Driver Name" class="form-control form-control-lg" value="{{ driver_filter }}">
+        </div>
+
+        <!-- Buttons -->
+        <div class="col-md-2 d-flex gap-2 justify-content-end flex-wrap">
+            <button type="submit" class="btn btn-danger btn-lg flex-fill">Filter</button>
+            <a href="{{ url_for('financial') }}" class="btn btn-secondary btn-lg flex-fill">Reset</a>
+            <a href="{{ url_for('financial', export='csv', start_date=start_date, end_date=end_date, vehicle_id=vehicle_filter, driver_name=driver_filter) }}" class="btn btn-success btn-lg flex-fill">CSV</a>
+        </div>
+    </form>
+
+    <!-- ----------------- Trip Details Table ----------------- -->
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center mb-0">
+            <thead class="table-dark sticky-top">
+                <tr>
+                    <th>Vehicle ID</th>
+                    <th>Vehicle Name</th>
+                    <th>Driver Name</th>
+                    <th>Status</th>
+                    <th>Trip Performance</th> <!-- NEW COLUMN -->
+                    <th>Type</th>
+                    <th>Group</th>
+                    <th>Customer</th>
+                    <th>Material</th>
+                    <th>LR No.</th>
+                    <th>Pickup</th>
+                    <th>Drop</th>
+                    <th>No. Buckets</th>
+                    <th>Load/Bucket</th>
+                    <th>Total Load</th>
+                    <th>Total Distance Travelled (km)</th>
+                    <th>Fuel Cost</th>
+                    <th>Total Cost</th>
+                    <th>Revenue</th>
+                    <th>PnL</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trip in routes %}
+                <tr class="align-middle">
+                    <td>{{ trip['Vehicle ID'] }}</td>
+                    <td>{{ trip['Vehicle Name'] }}</td>
+                    <td>{{ trip['Driver Name'] }}</td>
+                    <td>{{ trip['Status'] }}</td>
+
+                    <!-- NEW TRIP PERFORMANCE COLUMN -->
+                    <td>
+                        <span class="
+                            {% if trip['Trip Performance'] == 'On-Time' %}
+                                text-success
+                            {% elif trip['Trip Performance'] == 'Delayed' %}
+                                text-danger
+                            {% elif trip['Trip Performance'] == 'Early' %}
+                                text-primary
+                            {% else %}
+                                text-secondary
+                            {% endif %}
+                        ">
+                            {{ trip['Trip Performance'] }}
+                        </span>
+                    </td>
+
+                    <td>{{ trip['Type'] }}</td>
+                    <td>{{ trip['Group'] }}</td>
+                    <td>{{ trip['Customer'] }}</td>
+                    <td>{{ trip['Material'] }}</td>
+                    <td>{{ trip['LR No.'] }}</td>
+                    <td>{{ trip['Pickup'] }}</td>
+                    <td>{{ trip['Drop'] }}</td>
+                    <td>{{ trip['No. Buckets'] }}</td>
+                    <td>{{ trip['Load/Bucket'] }}</td>
+                    <td>{{ trip['Total Load'] }}</td>
+                    <td>{{ trip['Total Distance Travelled'] | round(2) }}</td>
+                    <td>{{ trip['Fuel Cost'] | round(2) }}</td>
+                    <td>{{ trip['Total Cost'] | round(2) }}</td>
+                    <td>{{ trip['Revenue'] | round(2) }}</td>
+                    <td class="{% if trip['PnL'] >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        {{ trip['PnL'] | round(2) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<!-- Required Scripts -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-<script>
-    function downloadTableAsCsv() {
-        const table = document.getElementById('tripTable');
-        let csv = [];
-        // Get headers
-        let headers = [];
-        for (let th of table.querySelectorAll('thead th')) {
-            headers.push(th.innerText);
-        }
-        csv.push(headers.join(','));
+<!-- ----------------- Custom CSS ----------------- -->
+<style>
+    body { background-color: #fdf2f2; font-family: 'Segoe UI', sans-serif; }
+    h2 { font-weight: 700; }
 
-        // Get rows
-        for (let row of table.querySelectorAll('tbody tr')) {
-            let rowData = [];
-            for (let cell of row.querySelectorAll('td')) {
-                rowData.push(cell.innerText.replace(/"/g, '""'));
-            }
-            csv.push(rowData.join(','));
-        }
-
-        const csvString = csv.join('\n');
-        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.setAttribute('download', 'trip_summary.csv');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    .table thead th {
+        background-color: #B82548 !important;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
-</script>
+    .table-hover tbody tr:hover { background-color: #ffe6e6; transition: all 0.2s ease-in-out; }
+    .table-responsive { background-color: #fff; border-radius: 0.5rem; padding: 0.5rem; }
+    .form-control-lg { border-radius: 0.5rem; }
+    .btn-lg { border-radius: 0.5rem; font-weight: 500; }
+    .sticky-top { top: 0; z-index: 10; }
+
+    /* Cards */
+    .card { border-radius: 0.75rem; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+    .card:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgb(0, 191, 255); }
+    .revenue-bar { transition: width 0.5s ease; height: 6px; margin-top: 5px; border-radius:3px; }
+
+    /* PnL colors */
+    .text-success { color: #28a745 !important; font-weight: 600; }
+    .text-danger { color: #dc3545 !important; font-weight: 600; }
+    .text-primary { color: #007bff !important; font-weight: 600; }
+    .text-secondary { color: #6c757d !important; font-weight: 600; }
+
+    .gap-2 { gap: 0.5rem !important; }
+    @media (max-width: 992px) {
+        .col-md-2.d-flex { flex-direction: column; }
+        .col-md-2.d-flex a, .col-md-2.d-flex button { width: 100%; }
+    }
+</style>
 {% endblock %}
-=======
-{% extends "layout.html" %}
-{% block content %}
-<div class="container-fluid py-5 px-4">
-  <div class="mb-4">
-    <h2 class="fw-bold text-primary mb-0">
-      <i class="bi bi-bar-chart-line me-2"></i> Transport Financial Dashboard
-    </h2>
-    <p class="text-muted">Visual overview of fuel cost, profit, performance and service status</p>
-  </div>
-
-  <!-- Filters Section -->
-  <div class="card shadow-sm p-4 mb-5">
-    <div class="row g-4">
-      <div class="col-md-3">
-        <label class="form-label fw-semibold">Indent Date</label>
-        <select id="filterDate" class="form-select">
-          <option value="All">All</option>
-          {% for d in summary.unique_dates %}
-            <option value="{{ d }}">{{ d }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-md-3">
-        <label class="form-label fw-semibold">Driver</label>
-        <select id="filterDriver" class="form-select">
-          <option value="All">All</option>
-          {% for d in summary.unique_drivers %}
-            <option value="{{ d }}">{{ d }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-md-3">
-        <label class="form-label fw-semibold">Vehicle</label>
-        <select id="filterVehicle" class="form-select">
-          <option value="All">All</option>
-          {% for v in summary.unique_vehicles %}
-            <option value="{{ v }}">{{ v }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-md-3">
-        <label class="form-label fw-semibold">Chart Type</label>
-        <select id="chartType" class="form-select">
-          <option value="pie">Pie</option>
-          <option value="bar">Bar</option>
-          <option value="line">Line</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- Charts Section -->
-  <div class="row g-4">
-    <div class="col-lg-6">
-      <div class="card shadow-sm p-3">
-        <h6 class="fw-bold mb-3 text-secondary">Fuel Cost Chart</h6>
-        <canvas id="fuelCostChart" height="220"></canvas>
-      </div>
-    </div>
-    <div class="col-lg-6">
-      <div class="card shadow-sm p-3">
-        <h6 class="fw-bold mb-3 text-secondary">Profit Chart</h6>
-        <canvas id="profitChart" height="220"></canvas>
-      </div>
-    </div>
-    <div class="col-lg-6">
-      <div class="card shadow-sm p-3">
-        <h6 class="fw-bold mb-3 text-secondary">Service Count Chart</h6>
-        <canvas id="serviceCountChart" height="220"></canvas>
-      </div>
-    </div>
-    <div class="col-lg-6">
-      <div class="card shadow-sm p-3">
-        <h6 class="fw-bold mb-3 text-secondary">Expected vs Actual Avg</h6>
-        <canvas id="avgChart" height="220"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- Map View -->
-  <div class="mt-5">
-    <h4 class="fw-semibold text-dark mb-3">Route Map View</h4>
-    <div id="map" class="rounded border shadow-sm" style="height: 400px;"></div>
-  </div>
-
-  <!-- Data Table -->
-  <div class="mt-5">
-    <div class="card shadow-sm">
-      <div class="card-header bg-dark text-white fw-semibold">Trip Summary Table</div>
-      <div class="table-responsive">
-        <table id="tripTable" class="table table-hover mb-0 align-middle">
-          <thead class="table-light">
-            <tr>
-              <th>Vehicle</th>
-              <th>Driver</th>
-              <th>Indent Date</th>
-              <th>Pickup</th>
-              <th>Drop</th>
-              <th>Total Km (TpT)</th>
-              <th>Rate</th>
-              <th>Total Cost</th>
-              <th>Total Cost (Loading)</th>
-              <th>Criteria</th>
-              <th>Total Cost (Unload)</th>
-              <th>Any Other Cost</th>
-              <th>Total Cost (Final)</th>
-              <th>Criteria</th>
-              <th>Cost</th>
-              <th>Revenue</th>
-              <th>P & L</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for t in routes %}
-              <tr>
-                <td>{{ t.vehicle_id }}</td>
-                <td>{{ t.driver_name }}</td>
-                <td>{{ t.indent_date }}</td>
-                <td>{{ t.pickup }}</td>
-                <td>{{ t.drop }}</td>
-                <td>{{ t.total_km }}</td>
-                <td>{{ t.rate }}</td>
-                <td>{{ t.total_cost }}</td>
-                <td>{{ t.total_cost_loading }}</td>
-                <td>{{ t.criteria_loading }}</td>
-                <td>{{ t.total_cost_unload }}</td>
-                <td>{{ t.other_cost }}</td>
-                <td>{{ t.final_total_cost }}</td>
-                <td>{{ t.criteria_unload }}</td>
-                <td>{{ t.cost }}</td>
-                <td>{{ t.revenue }}</td>
-                <td>{{ t.pnl }}</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Required Scripts -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script>
-// Your chart & filtering logic goes here
-</script>
-{% endblock %}
->>>>>>> 40c2f3a2a5a30ae7630fc05918625d6143f376f8

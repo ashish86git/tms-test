@@ -1,24 +1,36 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TMS Portal</title>
+  <title>TMS Portal - Drona Logitech</title>
 
-  <!-- Bootstrap & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #f1f3f5;
-      margin: 0;
+
+    :root {
+      --primary-maroon: #dc3545; /* Richer, Professional Maroon */
+      --secondary-red: #C73E4E; /* Slightly lighter red for accents */
+      --accent-gold: #FFC107; /* A sophisticated gold/yellow for highlights (instead of bright red) */
+      --text-dark: #343a40; /* Darker text color for better readability on light background */
+      --text-light: #f7fafa; /* Light text color (mostly white) */
+      --background-light: #f8f9fa; /* Very light gray/white background for main content */
+      --background-body: #f1f2f6; /* Subtle background for the page */
+      --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--background-body);
+      margin: 0;
+      color: var(--text-dark);
+    }
+
+    /* --- Navbar Styling --- */
     .navbar {
       position: fixed;
       top: 0;
@@ -26,140 +38,285 @@
       right: 0;
       z-index: 1030;
       height: 56px;
-      background-color: #212529;
+      /* Gradient for a premium look */
+      background: linear-gradient(90deg, var(--primary-maroon) 0%, #B82548 100%);
+      box-shadow: var(--shadow-soft);
     }
 
     .navbar-brand {
-      font-weight: 600;
-      font-size: 20px;
+      font-weight: 700;
+      font-size: 22px;
+      color: var(--text-light) !important;
     }
 
+    .navbar-brand .bi-truck-front-fill {
+        color: var(--accent-gold); /* Gold icon on dark background */
+    }
+
+    /* --- Sidebar Styling --- */
     .sidebar {
       height: 100vh;
-      width: 240px;
+      width: 260px; /* Slightly wider sidebar */
       position: fixed;
       top: 56px;
       left: 0;
-      background-color: #1e1e2f;
+      background-color: var(--primary-maroon);
       overflow-y: auto;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease-in-out;
+      box-shadow: 4px 0 10px rgba(0,0,0,0.2);
+      transition: all 0.3s ease-in-out;
+      border-right: 1px solid #7c152e;
+      /* For Mobile, Sidebar must be hidden by default using transform */
+      transform: translateX(-260px);
     }
 
-    .sidebar.collapsed {
-      transform: translateX(-100%);
+    /* Sidebar should only be permanently visible on large screens (lg) */
+    @media (min-width: 992px) {
+        .sidebar {
+            transform: translateX(0);
+        }
+    }
+
+    /* Class to show sidebar on mobile (toggled by JS) */
+    .sidebar.show {
+        transform: translateX(0);
     }
 
     .sidebar .logo-section {
-      padding: 20px 0 15px;
-      border-bottom: 1px solid #343a40;
+      padding: 15px 5px 15px;
       text-align: center;
+      background-color: #921A37;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
 
     .sidebar img {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background-color: #fff;
-      padding: 4px;
+      width: 120px; /* चौड़ाई 150px से कम करके 120px की गई */
+      height: 80px; /* ऊँचाई को चौड़ाई से कम रखा गया ताकि आयताकार दिखे */
+      border-radius: 8px; /* आयताकार रखने के लिए 100% को 8px किया गया */
+      border: 4px solid var(--accent-gold);
+      padding: 0;
+      object-fit: contain; /* इमेज को बिना काटे पूरी तरह से कंटेनर में फिट करने के लिए */
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.2));
+      transform: scale(1);
+      transition: all 0.3s ease-in-out;
+    }
+
+    .sidebar img:hover {
+        transform: scale(1.05);
+        filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.4));
     }
 
     .sidebar h6 {
-      font-size: 15px;
-      margin-top: 8px;
-      color: #ffc107;
+      font-size: 16px;
+      margin-top: 10px;
+      color: var(--text-light);
       font-weight: 600;
+      letter-spacing: 0.5px;
     }
 
     .sidebar h5 {
-      padding: 10px 20px 5px;
+      padding: 15px 20px 5px;
       font-size: 13px;
-      color: #adb5bd;
+      color: #e9ecef; /* Lighter gray for section headers */
       text-transform: uppercase;
-      margin-bottom: 4px;
+      margin-bottom: 0;
+      font-weight: 500;
+      letter-spacing: 1px;
     }
 
+    /* --- Sidebar List Items --- */
     .list-group-item {
-      font-size: 14px;
-      padding: 10px 18px;
+      font-size: 15px;
+      padding: 12px 20px;
       background-color: transparent;
-      color: #dee2e6;
-      transition: all 0.2s ease-in-out;
+      color: var(--text-light);
+      border: none;
+      transition: all 0.3s ease-in-out;
+      position: relative;
+    }
+
+    .list-group-item .bi {
+        margin-right: 12px;
+        font-size: 18px;
+        transition: transform 0.2s;
     }
 
     .list-group-item:hover {
-      background-color: #343a40;
-      color: #ffc107;
-      border-left: 4px solid #ffc107;
-      padding-left: 14px;
+      background-color: #B82548; /* Secondary Red on hover */
+      color: var(--text-light);
+      /* Subtle lift effect */
+      transform: translateX(5px);
     }
 
     .list-group-item.active {
-      background-color: #343a40 !important;
-      color: #ffc107 !important;
+      /* Stronger visual cue for active state */
+      background-color: var(--secondary-red) !important;
+      color: var(--text-light) !important;
       font-weight: 600;
-      border-left: 4px solid #ffc107;
-      padding-left: 14px;
+      box-shadow: inset 5px 0 0 var(--accent-gold); /* Gold indicator line */
     }
 
+    .list-group-item.active:hover {
+        background-color: #c73e4e !important;
+        transform: none; /* No shift on active hover */
+    }
+
+    /* --- Content Area --- */
     .content {
-      margin-left: 240px;
-      padding: 80px 30px 30px 30px;
+      margin-left: 0; /* Default to 0 for mobile */
+      padding: 80px 20px 30px 20px; /* Reduced padding for mobile */
+      min-height: calc(100vh - 56px);
+      background-color: var(--background-light);
+      transition: margin-left 0.3s ease-in-out;
+    }
+
+    /* Content margin for Desktop/Large Screens (lg) */
+    @media (min-width: 992px) {
+        .content {
+            margin-left: 260px; /* Must match sidebar width */
+            padding: 80px 40px 40px 40px; /* More padding for desktop */
+        }
+    }
+
+    /* --- General Component Styling --- */
+    .alert {
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border-left: 5px solid;
     }
 
     .btn-outline-light {
-      border-radius: 20px;
+      border-color: var(--text-light);
+      color: var(--text-light);
+      border-radius: 4px; /* Slightly squarer for professional look */
       transition: 0.3s;
+      font-weight: 500;
     }
 
     .btn-outline-light:hover {
-      background-color: #ffc107;
-      color: #212529;
-      border-color: #ffc107;
+      background-color: var(--accent-gold);
+      color: var(--primary-maroon); /* Dark text on gold hover */
+      border-color: var(--accent-gold);
     }
 
-    .alert {
-      border-radius: 10px;
+    .nav-item.text-uppercase.small {
+        padding: 15px 20px 5px;
+        color: #e9ecef;
+        font-weight: 500;
+        letter-spacing: 1px;
     }
 
-    .text-warning {
-      font-weight: 600;
+    /* Global Icons on Sidebar (adjusting to dark background) */
+    .list-group-item .bi {
+        /* Default icon color for links in the sidebar */
+        color: var(--accent-gold) !important;
     }
 
-    .bi {
-      vertical-align: middle;
-      margin-right: 6px;
-    }
+    /* Specific icon colors (for visual differentiation in the sidebar, but better to keep one theme color) */
+    .list-group-item:nth-child(5) .bi { color: #f29c00 !important; } /* Fleet Master - slightly different gold */
+    .list-group-item:nth-child(6) .bi { color: #dc3545 !important; } /* Maintenance - Red */
+    .list-group-item:nth-child(7) .bi { color: #ffc107 !important; } /* Driver - Gold */
+    .list-group-item:nth-child(10) .bi { color: #43b174 !important; } /* Tyre Management - Green */
+    .list-group-item:nth-child(11) .bi { color: #f0ad4e !important; } /* Issue Management - Orange */
 
-    @media (max-width: 767.98px) {
-      .content {
-        margin-left: 0;
-        padding: 80px 15px 30px 15px;
-      }
 
+    /* --- Responsive Adjustments (Simplified for better mobile control) --- */
+    @media (max-width: 991.98px) {
+      /* Sidebar is controlled by 'transform' and 'show' class now, not d-none/d-md-block */
       .sidebar {
-        position: fixed;
-        top: 56px;
-        left: 0;
-        z-index: 1050;
+        /* Ensure it's fixed and on top of content when visible on mobile */
+        z-index: 1040;
       }
     }
   </style>
+
+  <style>
+    /* New rule for the Financial Dashboard heading color to match --primary-maroon */
+    .financial-dashboard-heading {
+        color: var(--primary-maroon) !important;
+        font-weight: 700;
+    }
+
+    body { background-color: #fdf2f2; font-family: 'Segoe UI', sans-serif; }
+    h2 { font-weight: 700; }
+
+    .table thead th {
+        background-color: #8B0000 !important;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .table-hover tbody tr:hover { background-color: #ffe6e6; transition: all 0.2s ease-in-out; }
+    .table-responsive { background-color: #fff; border-radius: 0.5rem; padding: 0.5rem; }
+    .form-control-lg { border-radius: 0.5rem; }
+    .btn-lg { border-radius: 0.5rem; font-weight: 500; }
+    .sticky-top { top: 0; z-index: 10; }
+
+    /* Cards */
+    .card { border-radius: 0.75rem; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+    .card:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgb(0, 191, 255); }
+    .revenue-bar { transition: width 0.5s ease; height: 6px; margin-top: 5px; border-radius:3px; }
+
+    /* PnL colors */
+    .text-success { color: #28a745 !important; font-weight: 600; }
+    .text-danger { color: #dc3545 !important; font-weight: 600; }
+
+    /* ✅ UPDATED: Card background color adjusted to use primary maroon for consistency */
+    .card[style*="background: linear-gradient(135deg, #ffcccc 0%, #ff4d4f 100%)"] {
+        background: linear-gradient(135deg, #fcebeb 0%, var(--primary-maroon) 100%) !important; /* Changed end color to primary-maroon */
+        color: var(--text-dark) !important;
+    }
+    /* ✅ UPDATED: The inline style inside the Jinja loop must also be updated, changing #ff4d4f to var(--primary-maroon) */
+
+
+    .revenue-bar.bg-danger {
+        background-color: var(--primary-maroon) !important; /* Use primary color for bar */
+    }
+    .btn-danger {
+        background-color: var(--primary-maroon) !important;
+        border-color: var(--primary-maroon) !important;
+    }
+    .btn-danger:hover {
+        background-color: #b82548 !important; /* Slightly darker on hover */
+        border-color: #b82548 !important;
+    }
+
+    @media (max-width: 992px) {
+        .col-lg-2 { flex: 0 0 50%; max-width: 50%; } /* Two cards per row on tablets */
+    }
+    @media (max-width: 576px) {
+        .col-lg-2, .col-md-4 { flex: 0 0 100%; max-width: 100%; } /* One card per row on mobiles */
+    }
+
+    /* Backdrop/Overlay for Mobile Menu */
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1039; /* Between navbar and sidebar */
+        display: none;
+    }
+    .sidebar.show ~ .sidebar-backdrop {
+        display: block;
+    }
+  </style>
+
 </head>
 
 <body>
 
-<!-- Top Navbar -->
 <nav class="navbar navbar-dark px-3">
-  <button class="btn btn-sm btn-outline-light d-md-none me-2" id="toggleSidebar">
+  <button class="btn btn-sm btn-outline-light d-lg-none me-2" id="toggleSidebar">
     <i class="bi bi-list"></i>
   </button>
-  <a class="navbar-brand text-warning" href="/dashboard">
+  <a class="navbar-brand" href="/dashboard">
     <i class="bi bi-truck-front-fill"></i> TMS Portal
   </a>
   <div class="ms-auto d-flex align-items-center">
     {% if session['user'] %}
-      <span class="text-white me-3"><i class="bi bi-person-circle"></i> {{ session['user'] }}</span>
+      <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i> {{ session['user'] }}</span>
       <a href="/logout" class="btn btn-outline-light btn-sm"><i class="bi bi-box-arrow-right"></i> Logout</a>
     {% else %}
       <a href="/auth" class="btn btn-outline-light btn-sm">Login</a>
@@ -167,69 +324,167 @@
   </div>
 </nav>
 
-<!-- Sidebar -->
-<div class="sidebar d-none d-md-block" id="sidebarMenu">
+<div class="sidebar" id="sidebarMenu">
   <div class="logo-section">
-    <img src="/static/tms.jpg" alt="TMS Logo" />
-    <h6>TMS Dashboard</h6>
+    <img src="/static/logo.JPG" alt="TMS Logo" />
+    <h6>Welcome, {{ session['user'] or 'Guest' }}</h6>
   </div>
 
   <div class="list-group list-group-flush">
-    <li class="nav-item text-uppercase text-white-50 small mb-1">Main</li>
+    <li class="nav-item text-uppercase small mb-1">MAIN</li>
     <a href="/dashboard" class="list-group-item {% if request.path == '/dashboard' %}active{% endif %}">
-      <i class="bi bi-house-fill text-warning"></i> Dashboard
+      <i class="bi bi-house-fill"></i> Dashboard
     </a>
     <a href="/financial" class="list-group-item {% if request.path == '/financial' %}active{% endif %}">
-      <i class="bi bi-bar-chart-fill text-warning"></i> Financial Dashboard
+      <i class="bi bi-bar-chart-fill"></i> Financial Dashboard
     </a>
 
-    <h5>Fleet Management</h5>
+    <h5>FLEET MANAGEMENT</h5>
     <a href="/fleet_master" class="list-group-item {% if request.path == '/fleet_master' %}active{% endif %}">
-      <i class="bi bi-truck text-success"></i> Fleet Master
+      <i class="bi bi-truck"></i> Fleet Master
     </a>
     <a href="/vehicle_maintenance" class="list-group-item {% if request.path == '/vehicle_maintenance' %}active{% endif %}">
-      <i class="bi bi-car-front-fill text-danger"></i> Vehicle Maintenance
+      <i class="bi bi-tools"></i> Vehicle Maintenance
     </a>
     <a href="/driver_master" class="list-group-item {% if request.path == '/driver_master' %}active{% endif %}">
-      <i class="bi bi-person-badge text-warning"></i> Driver Master
+      <i class="bi bi-person-badge"></i> Driver Master
     </a>
     <a href="/trip-history" class="list-group-item {% if request.path == '/trip-history' %}active{% endif %}">
-      <i class="bi bi-clock-history text-secondary"></i> Trip History
+      <i class="bi bi-clock-history"></i> Trip History
     </a>
     <a href="/tyre-management" class="list-group-item {% if request.path == '/tyre-management' %}active{% endif %}">
-      <i class="bi bi-circle-half text-success"></i> Tyre Management
+      <i class="bi bi-circle-half"></i> Tyre Management
     </a>
     <a href="/issue-management" class="list-group-item {% if request.path == '/issue-management' %}active{% endif %}">
-      <i class="bi bi-exclamation-diamond text-warning"></i> Issue Management
+      <i class="bi bi-exclamation-diamond"></i> Issue Management
     </a>
 
-    <h5>Transport Management</h5>
+    <h5>TRANSPORT MANAGEMENT</h5>
     <a href="/def" class="list-group-item {% if request.path == '/def' %}active{% endif %}">
-      <i class="bi bi-file-earmark-text-fill text-primary"></i> DEF
+      <i class="bi bi-file-earmark-text-fill"></i> DEF
     </a>
     <a href="/orders" class="list-group-item {% if request.path == '/orders' %}active{% endif %}">
-      <i class="bi bi-box-seam text-primary"></i> Orders
+      <i class="bi bi-box-seam"></i> Orders
     </a>
     <a href="/optimize" class="list-group-item {% if request.path == '/optimize' %}active{% endif %}">
-      <i class="bi bi-graph-up-arrow text-info"></i> Optimize Route
+      <i class="bi bi-graph-up-arrow"></i> Optimize Route
     </a>
     <a href="/tracking" class="list-group-item {% if request.path == '/tracking' %}active{% endif %}">
-      <i class="bi bi-geo-alt-fill text-info"></i> GPS Tracking
+      <i class="bi bi-geo-alt-fill"></i> GPS Tracking
     </a>
 
+    <hr class="text-white mx-3 my-2 opacity-50">
 
     <a href="/download-report" class="list-group-item {% if request.path == '/download-report' %}active{% endif %}">
-      <i class="bi bi-download text-success"></i> Download Report
+      <i class="bi bi-download"></i> Download Report
     </a>
   </div>
 </div>
 
-<!-- Page Content -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+
 <div class="content">
-  {% block content %}{% endblock %}
+  <div class="row">
+      <div class="col-12">
+          <h2 class="mb-4 text-dark" style="font-weight: 600;">Welcome to the TMS Portal!</h2>
+          <div class="card shadow-sm border-0 mb-4">
+</div>
+      </div>
+  </div>
+  {% block content %}
+
+<div class="container-fluid mt-4">
+    <h2 class="mb-4 financial-dashboard-heading">Financial Dashboard</h2>
+
+    <div class="row mb-4">
+        {% for vehicle in top_vehicles %}
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="card shadow-sm border-0 text-center p-3 h-100"
+                 style="background: linear-gradient(135deg, #fcebeb 0%, var(--primary-maroon) 100%); color: var(--text-dark);"> <div class="card-body">
+                    <h5 class="card-title text-truncate">{{ vehicle['Vehicle Name'] }}</h5>
+                    <p class="card-text mb-1"><strong>ID:</strong> {{ vehicle['Vehicle ID'] }}</p>
+                    <p class="card-text mb-1"><strong>Trips:</strong> {{ vehicle['Trips'] }}</p>
+                    <p class="card-text mb-1"><strong>Revenue:</strong> ₹{{ vehicle['Revenue'] | round(2) }}</p>
+                    <p class="card-text mb-1"><strong>Total Distance:</strong> {{ vehicle['Total Distance Travelled'] | round(2) }} km</p>
+                    <div class="revenue-bar bg-danger rounded" style="width: {{ vehicle['Revenue_Percent'] }}%; height: 6px; margin-top:5px;"></div>
+                    <p class="card-text mb-0 {% if vehicle['PnL'] >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        <strong>PnL:</strong> ₹{{ vehicle['PnL'] | round(2) }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <form class="row g-3 mb-4 p-3 bg-light rounded shadow-sm" method="get">
+        <div class="col-md-3">
+            <input type="text" name="vehicle_id" placeholder="Vehicle ID" class="form-control form-control-lg" value="{{ vehicle_filter }}">
+        </div>
+        <div class="col-md-3">
+            <input type="text" name="driver_name" placeholder="Driver Name" class="form-control form-control-lg" value="{{ driver_filter }}">
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+            <button type="submit" class="btn btn-danger me-2 btn-lg">Filter</button>
+            <a href="{{ url_for('financial') }}" class="btn btn-secondary me-2 btn-lg">Reset</a>
+            <a href="{{ url_for('financial', export='csv', vehicle_id=vehicle_filter, driver_name=driver_filter) }}" class="btn btn-success btn-lg">Export CSV</a>
+        </div>
+    </form>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center mb-0">
+            <thead class="table-dark sticky-top">
+                <tr>
+                    <th>Vehicle ID</th>
+                    <th>Vehicle Name</th>
+                    <th>Driver Name</th>
+                    <th>Status</th>
+                    <th>Type</th>
+                    <th>Group</th>
+                    <th>Customer</th>
+                    <th>Material</th>
+                    <th>LR No.</th>
+                    <th>Pickup</th>
+                    <th>Drop</th>
+                    <th>No. Buckets</th>
+                    <th>Load/Bucket</th>
+                    <th>Total Load</th>
+                    <th>Fuel Cost</th>
+                    <th>Total Cost</th>
+                    <th>Revenue</th>
+                    <th>PnL</th>
+                    <th>Total Distance Travelled (km)</th>  </tr>
+            </thead>
+            <tbody>
+                {% for trip in routes %}
+                <tr class="align-middle">
+                    <td>{{ trip['Vehicle ID'] }}</td>
+                    <td>{{ trip['Vehicle Name'] }}</td>
+                    <td>{{ trip['Driver Name'] }}</td>
+                    <td>{{ trip['Status'] }}</td>
+                    <td>{{ trip['Type'] }}</td>
+                    <td>{{ trip['Group'] }}</td>
+                    <td>{{ trip['Customer'] }}</td>
+                    <td>{{ trip['Material'] }}</td>
+                    <td>{{ trip['LR No.'] }}</td>
+                    <td>{{ trip['Pickup'] }}</td>
+                    <td>{{ trip['Drop'] }}</td>
+                    <td>{{ trip['No. Buckets'] }}</td>
+                    <td>{{ trip['Load/Bucket'] }}</td>
+                    <td>{{ trip['Total Load'] }}</td>
+                    <td>{{ trip['Fuel Cost'] | round(2) }}</td>
+                    <td>{{ trip['Total Cost'] | round(2) }}</td>
+                    <td>{{ trip['Revenue'] | round(2) }}</td>
+                    <td class="{% if trip['PnL'] >= 0 %}text-success{% else %}text-danger{% endif %}">{{ trip['PnL'] | round(2) }}</td>
+                    <td>{{ trip['Total Distance Travelled'] | round(2) }}</td> </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
 </div>
 
-<!-- Flash Messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     <div class="container mt-3">
@@ -243,279 +498,54 @@
   {% endif %}
 {% endwith %}
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Sidebar Toggle Script -->
 <script>
   const toggleBtn = document.getElementById('toggleSidebar');
   const sidebar = document.getElementById('sidebarMenu');
+  const content = document.querySelector('.content');
+  const backdrop = document.getElementById('sidebarBackdrop');
 
-  toggleBtn?.addEventListener('click', () => {
-    sidebar.classList.toggle('d-none');
+  function toggleMenu() {
+    sidebar.classList.toggle('show');
+    // For mobile (width < 992px), prevent scrolling body when sidebar is open
+    if (window.innerWidth < 992) {
+        document.body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : 'auto';
+    }
+  }
+
+  toggleBtn?.addEventListener('click', toggleMenu);
+  backdrop?.addEventListener('click', toggleMenu); // Close sidebar when clicking backdrop
+
+  // Close sidebar if a link is clicked on mobile
+  const sidebarLinks = sidebar.querySelectorAll('.list-group-item');
+  sidebarLinks.forEach(link => {
+      link.addEventListener('click', () => {
+          if (window.innerWidth < 992) {
+              toggleMenu();
+          }
+      });
   });
+
+  // Re-enable body scroll if user resizes window to desktop while sidebar is open
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 992) {
+        // Ensure desktop layout is correct
+        sidebar.classList.remove('show');
+        document.body.style.overflow = 'auto';
+    }
+  });
+
+  // Initial check to ensure correct layout on page load
+  window.addEventListener('load', () => {
+      if (window.innerWidth >= 992) {
+          content.style.marginLeft = '260px';
+      } else {
+          content.style.marginLeft = '0';
+      }
+  });
+
 </script>
 
 </body>
 </html>
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TMS Portal</title>
-
-  <!-- Bootstrap & Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #f1f3f5;
-      margin: 0;
-    }
-
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1030;
-      height: 56px;
-      background-color: #212529;
-    }
-
-    .navbar-brand {
-      font-weight: 600;
-      font-size: 20px;
-    }
-
-    .sidebar {
-      height: 100vh;
-      width: 240px;
-      position: fixed;
-      top: 56px;
-      left: 0;
-      background-color: #1e1e2f;
-      overflow-y: auto;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease-in-out;
-    }
-
-    .sidebar.collapsed {
-      transform: translateX(-100%);
-    }
-
-    .sidebar .logo-section {
-      padding: 20px 0 15px;
-      border-bottom: 1px solid #343a40;
-      text-align: center;
-    }
-
-    .sidebar img {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background-color: #fff;
-      padding: 4px;
-    }
-
-    .sidebar h6 {
-      font-size: 15px;
-      margin-top: 8px;
-      color: #ffc107;
-      font-weight: 600;
-    }
-
-    .sidebar h5 {
-      padding: 10px 20px 5px;
-      font-size: 13px;
-      color: #adb5bd;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .list-group-item {
-      font-size: 14px;
-      padding: 10px 18px;
-      background-color: transparent;
-      color: #dee2e6;
-      transition: all 0.2s ease-in-out;
-    }
-
-    .list-group-item:hover {
-      background-color: #343a40;
-      color: #ffc107;
-      border-left: 4px solid #ffc107;
-      padding-left: 14px;
-    }
-
-    .list-group-item.active {
-      background-color: #343a40 !important;
-      color: #ffc107 !important;
-      font-weight: 600;
-      border-left: 4px solid #ffc107;
-      padding-left: 14px;
-    }
-
-    .content {
-      margin-left: 240px;
-      padding: 80px 30px 30px 30px;
-    }
-
-    .btn-outline-light {
-      border-radius: 20px;
-      transition: 0.3s;
-    }
-
-    .btn-outline-light:hover {
-      background-color: #ffc107;
-      color: #212529;
-      border-color: #ffc107;
-    }
-
-    .alert {
-      border-radius: 10px;
-    }
-
-    .text-warning {
-      font-weight: 600;
-    }
-
-    .bi {
-      vertical-align: middle;
-      margin-right: 6px;
-    }
-
-    @media (max-width: 767.98px) {
-      .content {
-        margin-left: 0;
-        padding: 80px 15px 30px 15px;
-      }
-
-      .sidebar {
-        position: fixed;
-        top: 56px;
-        left: 0;
-        z-index: 1050;
-      }
-    }
-  </style>
-</head>
-
-<body>
-
-<!-- Top Navbar -->
-<nav class="navbar navbar-dark px-3">
-  <button class="btn btn-sm btn-outline-light d-md-none me-2" id="toggleSidebar">
-    <i class="bi bi-list"></i>
-  </button>
-  <a class="navbar-brand text-warning" href="/dashboard">
-    <i class="bi bi-truck-front-fill"></i> TMS Portal
-  </a>
-  <div class="ms-auto d-flex align-items-center">
-    {% if session['user'] %}
-      <span class="text-white me-3"><i class="bi bi-person-circle"></i> {{ session['user'] }}</span>
-      <a href="/logout" class="btn btn-outline-light btn-sm"><i class="bi bi-box-arrow-right"></i> Logout</a>
-    {% else %}
-      <a href="/auth" class="btn btn-outline-light btn-sm">Login</a>
-    {% endif %}
-  </div>
-</nav>
-
-<!-- Sidebar -->
-<div class="sidebar d-none d-md-block" id="sidebarMenu">
-  <div class="logo-section">
-    <img src="/static/tms.jpg" alt="TMS Logo" />
-    <h6>TMS Dashboard</h6>
-  </div>
-
-  <div class="list-group list-group-flush">
-    <li class="nav-item text-uppercase text-white-50 small mb-1">Main</li>
-    <a href="/dashboard" class="list-group-item {% if request.path == '/dashboard' %}active{% endif %}">
-      <i class="bi bi-house-fill text-warning"></i> Dashboard
-    </a>
-    <a href="/financial" class="list-group-item {% if request.path == '/financial' %}active{% endif %}">
-      <i class="bi bi-bar-chart-fill text-warning"></i> Financial Dashboard
-    </a>
-
-    <h5>Fleet Management</h5>
-    <a href="/fleet_master" class="list-group-item {% if request.path == '/fleet_master' %}active{% endif %}">
-      <i class="bi bi-truck text-success"></i> Fleet Master
-    </a>
-    <a href="/vehicle_maintenance" class="list-group-item {% if request.path == '/vehicle_maintenance' %}active{% endif %}">
-      <i class="bi bi-car-front-fill text-danger"></i> Vehicle Maintenance
-    </a>
-    <a href="/driver_master" class="list-group-item {% if request.path == '/driver_master' %}active{% endif %}">
-      <i class="bi bi-person-badge text-warning"></i> Driver Master
-    </a>
-    <a href="/trip-history" class="list-group-item {% if request.path == '/trip-history' %}active{% endif %}">
-      <i class="bi bi-clock-history text-secondary"></i> Trip History
-    </a>
-    <a href="/tyre-management" class="list-group-item {% if request.path == '/tyre-management' %}active{% endif %}">
-      <i class="bi bi-circle-half text-success"></i> Tyre Management
-    </a>
-    <a href="/issue-management" class="list-group-item {% if request.path == '/issue-management' %}active{% endif %}">
-      <i class="bi bi-exclamation-diamond text-warning"></i> Issue Management
-    </a>
-
-    <h5>Transport Management</h5>
-    <a href="/def" class="list-group-item {% if request.path == '/def' %}active{% endif %}">
-      <i class="bi bi-file-earmark-text-fill text-primary"></i> DEF
-    </a>
-    <a href="/orders" class="list-group-item {% if request.path == '/orders' %}active{% endif %}">
-      <i class="bi bi-box-seam text-primary"></i> Orders
-    </a>
-    <a href="/optimize" class="list-group-item {% if request.path == '/optimize' %}active{% endif %}">
-      <i class="bi bi-graph-up-arrow text-info"></i> Optimize Route
-    </a>
-    <a href="/tracking" class="list-group-item {% if request.path == '/tracking' %}active{% endif %}">
-      <i class="bi bi-geo-alt-fill text-info"></i> GPS Tracking
-    </a>
-
-
-    <a href="/download-report" class="list-group-item {% if request.path == '/download-report' %}active{% endif %}">
-      <i class="bi bi-download text-success"></i> Download Report
-    </a>
-  </div>
-</div>
-
-<!-- Page Content -->
-<div class="content">
-  {% block content %}{% endblock %}
-</div>
-
-<!-- Flash Messages -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <div class="container mt-3">
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-{% endwith %}
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Sidebar Toggle Script -->
-<script>
-  const toggleBtn = document.getElementById('toggleSidebar');
-  const sidebar = document.getElementById('sidebarMenu');
-
-  toggleBtn?.addEventListener('click', () => {
-    sidebar.classList.toggle('d-none');
-  });
-</script>
-
-</body>
-</html>
->>>>>>> 40c2f3a2a5a30ae7630fc05918625d6143f376f8

@@ -61,6 +61,7 @@
     </div>
 
     <!-- Add New Driver Form Card -->
+    <!-- Add New Driver Form Card -->
     <div class="card shadow">
         <div class="card-header bg-success text-white">
             <h5 class="mb-0">Add New Driver</h5>
@@ -100,11 +101,24 @@
                         <label class="form-label">Shift Info</label>
                         <input type="text" name="shift_info" class="form-control" required>
                     </div>
-                    <!-- New Form Field for Salary -->
+
+                    <!-- Vehicle ID dropdown added -->
+                    <div class="col-md-6">
+                        <label class="form-label">Vehicle ID</label>
+                        <select name="vehicle_id" class="form-select" required>
+                            <option value="">-- Select Vehicle --</option>
+                            {% for v in fleet_data %}
+                                <option value="{{ v }}">{{ v }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Salary field -->
                     <div class="col-md-6">
                         <label class="form-label">Salary</label>
                         <input type="text" name="salary" class="form-control" required>
                     </div>
+
                     <div class="col-md-6">
                         <label class="form-label">Upload Aadhar</label>
                         <input type="file" name="aadhar_file" id="aadhar_file" class="form-control" accept="image/*,.pdf" required>
@@ -116,13 +130,14 @@
                         <div id="license_preview" class="mt-2"></div>
                     </div>
                 </div>
+
                 <div class="text-end mt-4">
                     <button type="submit" class="btn btn-success">Add Driver</button>
                 </div>
             </form>
         </div>
     </div>
-</div>
+
 
 <!-- File Preview Script -->
 <script>

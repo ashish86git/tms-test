@@ -1,98 +1,208 @@
 {% extends "layout.html" %}
+
+{% block title %}Trip History{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+<style>
+    .status-Arrived { color: green; font-weight: bold; }
+    .status-Delayed { color: red; font-weight: bold; }
+    .status-Pending { color: orange; font-weight: bold; }
+
+    /* Status Filter Buttons */
+    .status-btn {
+        margin-right: 8px;
+        border-radius: 20px;
+        padding: 6px 16px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .status-btn.active {
+        background: black !important;
+        color: white !important;
+        border: 2px solid black !important;
+    }
+</style>
+{% endblock %}
+
+
+
 {% block content %}
-<div class="container-fluid">
-  <h2 class="mb-4 fw-bold text-dark"><i class="bi bi-clock-history text-secondary me-2"></i>Trip History (Optimized Routes)</h2>
-  <a href="/optimize" class="btn btn-sm btn-dark mb-3"><i class="bi bi-arrow-left-circle"></i> Back to Optimize</a>
+<div class="container-fluid p-3">
+    <h2 class="mb-3">Trip History</h2>
 
-  <!-- Filter Form -->
-  <form method="get" class="row g-3 align-items-end mb-4">
-    <div class="col-md-4">
-      <label for="vehicle_id" class="form-label fw-semibold">Vehicle ID</label>
-      <select name="vehicle_id" id="vehicle_id" class="form-select">
-        <option value="">All Vehicles</option>
-        {% for vid in all_vehicle_ids %}
-          <option value="{{ vid }}" {% if vid == selected_vehicle_id %}selected{% endif %}>{{ vid }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="col-md-4">
-      <label for="driver_name" class="form-label fw-semibold">Driver Name</label>
-      <select name="driver_name" id="driver_name" class="form-select">
-        <option value="">All Drivers</option>
-        {% for dname in all_driver_names %}
-          <option value="{{ dname }}" {% if dname == selected_driver_name %}selected{% endif %}>{{ dname }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="col-md-2">
-      <button type="submit" class="btn btn-warning w-100"><i class="bi bi-funnel-fill"></i> Filter</button>
-    </div>
-    <div class="col-md-2">
-      <a href="/trip-history" class="btn btn-secondary w-100"><i class="bi bi-x-circle"></i> Reset</a>
-    </div>
-  </form>
+    <!-- FILTER FORM -->
+    <form id="filterForm" class="row g-2 mb-3">
+        <div class="col-md-3 col-lg-2"><input type="text" name="vehicle" class="form-control" placeholder="Vehicle No" value="{{ request.args.get('vehicle', '') }}"></div>
+        <div class="col-md-3 col-lg-2"><input type="text" name="indent" class="form-control" placeholder="Indent ID" value="{{ request.args.get('indent', '') }}"></div>
+        <div class="col-md-3 col-lg-2"><input type="date" name="start_date" class="form-control" value="{{ request.args.get('start_date', '') }}"></div>
+        <div class="col-md-3 col-lg-2"><input type="date" name="end_date" class="form-control" value="{{ request.args.get('end_date', '') }}"></div>
 
-  <div class="card border-0 shadow-sm rounded-4 p-3">
-    {% if routes and routes|length > 0 %}
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="/trip-history" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+
+
+    <!-- ⭐ STATUS FILTER BUTTONS (NO DROPDOWN) -->
+    <div class="mb-3">
+        <button class="btn btn-outline-dark status-btn active" data-status="">All</button>
+        <button class="btn btn-outline-success status-btn" data-status="Arrived">🟢 Arrived</button>
+        <button class="btn btn-outline-danger status-btn" data-status="Delayed">🔴 Delayed</button>
+        <button class="btn btn-outline-warning status-btn" data-status="Pending">🟠 Pending</button>
+    </div>
+
+
+    <!-- TABLE -->
     <div class="table-responsive">
-      <table class="table table-hover table-striped align-middle">
-        <thead class="table-dark">
-          <tr>
-            <th>Vehicle</th>
-            <th>Driver</th>
-            <th>Date</th>
-            <th>Pickup</th>
-            <th>Drop</th>
-            <th>Distance (km)</th>
-            <th>Fuel Used (L)</th>
-            <th class="text-end">Fuel Cost (₹)</th>
-            <th>Expected Avg</th>
-            <th>Actual Avg</th>
-            <th>Service</th>
-            <th class="text-end">Amount (₹)</th>
-            <th class="text-end">Profit (₹)</th>
-            <th>Total Dist (km)</th>
-            <th>Travel Time (hrs)</th>
-            <th>Est. Fuel (L)</th>
-            <th>Delivery Window</th>
-            <th>Orders</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for trip in routes %}
-          <tr class="{% if trip.service_suggestion == 'Yes' %}table-danger{% endif %}">
-            <td>{{ trip.vehicle_id }}</td>
-            <td>{{ trip.driver_name }}</td>
-            <td>{{ trip.date }}</td>
-            <td>{{ trip.pickup }}</td>
-            <td>{{ trip.drop }}</td>
-            <td>{{ trip.distance_km }}</td>
-            <td>{{ trip.fuel_used_l }}</td>
-            <td class="text-end fw-semibold">₹{{ trip.fuel_cost }}</td>
-            <td>{{ trip.avg_expected }}</td>
-            <td>{{ trip.avg_actual }}</td>
-            <td>
-              {% if trip.service_suggestion == 'Yes' %}
-                <span class="badge bg-danger">Yes</span>
-              {% else %}
-                <span class="badge bg-success">No</span>
-              {% endif %}
-            </td>
-            <td class="text-end fw-semibold">₹{{ trip.amount }}</td>
-            <td class="text-end fw-semibold">₹{{ trip.profit }}</td>
-            <td>{{ trip.total_distance }}</td>
-            <td>{{ trip.estimated_travel_time_hrs }}</td>
-            <td>{{ trip.estimated_fuel_liters }}</td>
-            <td>{{ trip.delivery_window }}</td>
-            <td>{{ trip.orders }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        <table id="tripTable" class="display nowrap table table-striped table-bordered w-100">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Indent ID</th>
+                    <th>Vehicle</th>
+                    <th>Driver</th>
+                    <th>Pickup</th>
+                    <th>Drop</th>
+                    <th>Total Drops</th>
+                    <th>Exit</th>
+                    <th>ETA</th>
+                    <th>Actual</th>
+                    <th>Distance</th>
+                    <th>Duration</th>
+                    <th>Customers</th>
+                    <th>POD</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for trip in trips %}
+                <tr data-id="{{ trip.id }}">
+                    <td>{{ trip.id }}</td>
+                    <td>{{ trip.indent_id }}</td>
+                    <td>{{ trip.vehicle_no }}</td>
+                    <td>{{ trip.driver_name }}</td>
+                    <td>{{ trip.pickup }}</td>
+                    <td>{{ trip.drop_location }}</td>
+                    <td>{{ trip.total_drops }}</td>
+                    <td>{{ trip.exit_time }}</td>
+                    <td>{{ trip.eta_arrival_time }}</td>
+
+                    <td>
+                        <input type="datetime-local" class="form-control actual-arrival"
+                            value="{{ trip.actual_arrival_time|default('', true)|replace(' ', 'T') }}">
+                    </td>
+
+                    <td>{{ trip.total_distance }}</td>
+                    <td>{{ trip.duration_hours }}</td>
+
+                    <td>
+                        {% for cust in trip.customer_details %}
+                        <div>{{ cust.name }} ({{ cust.mobile }})</div>
+                        {% endfor %}
+                    </td>
+
+                    <td>
+                        <input type="text" class="form-control pod-url" placeholder="POD URL"
+                            value="{{ trip.pod_url or '' }}">
+                    </td>
+
+                    <td class="status-{{ trip.status }}">{{ trip.status }}</td>
+
+                    <td><button class="btn btn-sm btn-success save-trip">Save</button></td>
+
+                    <td>{{ trip.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
     </div>
-    {% else %}
-    <div class="alert alert-info text-center mt-3">No optimized routes available.</div>
-    {% endif %}
-  </div>
 </div>
+{% endblock %}
+
+
+
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+
+<script>
+$(document).ready(function () {
+
+    // DATATABLE INITIALISATION
+    var table = $('#tripTable').DataTable({
+        dom: 'Bfrtip',
+        scrollX: true,
+        pageLength: 10,
+        buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+    });
+
+    // ⭐ STATUS FILTER BUTTON WORKING FIXED
+    $('.status-btn').on('click', function () {
+
+        $('.status-btn').removeClass('active');
+        $(this).addClass('active');
+
+        var status = $(this).data('status');
+
+        // STATUS COLUMN INDEX = 14
+        table.column(14).search(status).draw();
+    });
+
+
+
+    // SAVE TRIP
+    $('.save-trip').on('click', function () {
+        var row = $(this).closest('tr');
+        var trip_id = row.data('id');
+        var actual_arrival = row.find('.actual-arrival').val();
+        var pod_url = row.find('.pod-url').val();
+
+        if (!actual_arrival || !pod_url) {
+            alert('Please enter both Actual Arrival Time and POD URL.');
+            return;
+        }
+
+        var btn = $(this);
+        btn.prop('disabled', true).text('Saving...');
+
+        $.ajax({
+            url: '/update-trip',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                trip_id: trip_id,
+                actual_arrival_time: actual_arrival,
+                pod_url: pod_url
+            }),
+            success: function (res) {
+                alert(res.message || "Trip Updated!");
+                location.reload();
+            },
+            error: function () {
+                alert("Error updating trip!");
+                btn.prop('disabled', false).text('Save');
+            }
+        });
+    });
+
+});
+</script>
 {% endblock %}

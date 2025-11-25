@@ -1,36 +1,209 @@
-<<<<<<< HEAD
 {% extends "layout.html" %}
 
+{% block title %}Create Indent{% endblock %}
+
 {% block content %}
+<style>
+    /* ---------------------------------------------------- */
+    /* --- Specific Styles for Create Indent Page --- */
+    /* ---------------------------------------------------- */
+
+    /* Card Styling */
+    .card {
+        border-radius: 8px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+        /* Subtle lift effect */
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    /* Primary Card Header (All Submitted Indents) - Matches Primary Maroon */
+    .card-header.bg-primary {
+        background-color: var(--primary-maroon) !important;
+        border-bottom: 2px solid var(--accent-gold);
+        color: var(--text-light) !important;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0 !important;
+    }
+
+    /* Info Card Header (Upload) - Matches Secondary Red/Accent */
+    .card-header.bg-info {
+        background-color: var(--secondary-red) !important;
+        color: var(--text-light) !important;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0 !important;
+    }
+
+    /* Success Card Header (Create New) */
+    .card-header.bg-success {
+        background-color: #28a745 !important; /* Keep a standard green for 'create' */
+        color: var(--text-light) !important;
+        font-weight: 600;
+        border-radius: 8px 8px 0 0 !important;
+    }
+
+    /* Table Styling */
+    #indentTable thead.table-dark {
+        background-color: var(--primary-maroon);
+        color: var(--text-light);
+        border: none;
+    }
+    #indentTable thead th {
+        border-color: #7c152e;
+        font-weight: 500;
+    }
+    #indentTable tbody tr:hover {
+        background-color: #fce4e4; /* Light hover effect */
+    }
+
+    /* Button Styling */
+    .btn-light {
+        color: var(--primary-maroon) !important;
+        border: 1px solid var(--primary-maroon);
+        transition: all 0.2s;
+    }
+    .btn-light:hover {
+        background-color: var(--primary-maroon) !important;
+        color: var(--text-light) !important;
+    }
+    .btn-info {
+        background-color: var(--secondary-red) !important;
+        border-color: var(--secondary-red) !important;
+        color: var(--text-light) !important;
+    }
+    .btn-info:hover {
+        background-color: #A01C3D !important; /* Darker red hover */
+        border-color: #A01C3D !important;
+    }
+    .btn-success {
+        background-color: #28a745 !important;
+        border-color: #28a745 !important;
+        transition: all 0.2s;
+    }
+    .btn-success:hover {
+        background-color: #1e7e34 !important;
+        border-color: #1e7e34 !important;
+    }
+    .btn-dark {
+        background-color: var(--primary-maroon) !important;
+        border-color: var(--primary-maroon) !important;
+        color: var(--text-light) !important;
+    }
+
+    /* Form Control Focus */
+    .form-control:focus, .form-select:focus {
+        border-color: var(--accent-gold);
+        box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
+    }
+
+    /* Customer Block */
+    .customer-block {
+        background-color: #fff;
+        border: 1px solid #dee2e6 !important;
+        transition: all 0.2s;
+    }
+
+    /* ---------------------------------------------------- */
+    /* --- Filter Button Group Customization --- */
+    /* ---------------------------------------------------- */
+    #status-filter-group .btn {
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    /* Customizing Primary/Warning/Info for Theme */
+    #status-filter-group .btn-primary {
+        background-color: var(--primary-maroon);
+        border-color: var(--primary-maroon);
+    }
+    #status-filter-group .btn-warning {
+        background-color: var(--accent-gold);
+        border-color: var(--accent-gold);
+        color: var(--text-dark); /* Dark text on gold */
+    }
+    #status-filter-group .btn-info {
+        background-color: #17a2b8; /* Standard Info/Blue */
+        border-color: #17a2b8;
+    }
+    #status-filter-group .btn-success {
+        background-color: #28a745; /* Standard Success/Green */
+        border-color: #28a745;
+    }
+
+    /* Ensuring Active State is Highlighting */
+    #status-filter-group .btn.active {
+        box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.5); /* Gold glow for active */
+        opacity: 0.9;
+        font-weight: 600;
+    }
+
+    /* Date Filter Dropdown */
+    .dropdown-toggle.btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    .dropdown-item.active {
+        background-color: var(--secondary-red) !important;
+        color: var(--text-light);
+    }
+
+    /* ---------------------------------------------------- */
+    /* --- Status Tracker Modal Customization --- */
+    /* ---------------------------------------------------- */
+    #statusModal .modal-header.bg-secondary {
+        background-color: var(--primary-maroon) !important;
+    }
+
+    /* Matching button outlines to theme colors */
+    #btnLoading { border-color: var(--accent-gold) !important; color: var(--text-dark) !important; }
+    #btnLoading:hover { background-color: var(--accent-gold) !important; color: var(--text-dark) !important; }
+
+    #btnParking { border-color: #17a2b8 !important; color: #17a2b8 !important; }
+    #btnParking:hover { background-color: #17a2b8 !important; color: var(--text-light) !important; }
+
+    #btnExit { border-color: #28a745 !important; color: #28a745 !important; }
+    #btnExit:hover { background-color: #28a745 !important; color: var(--text-light) !important; }
+
+    /* Progress Bar Themeing */
+    #statusProgress {
+        font-weight: 600;
+        height: 32px !important;
+        font-size: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .progress-bar-animated {
+        animation: progress-bar-stripes 1s linear infinite;
+    }
+
+</style>
+
 <div class="container-fluid">
 
-  {# ───────────────────────── Flash Modal (Success Only) ───────────────────── #}
+  {# ───────────────────────── Flash Messages / Success Modal ───────────────────── #}
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% for category, message in messages %}
       {% if category == 'success' %}
+        {# Success Modal remains for visual impact #}
         <button type="button" class="d-none" id="flashModalBtn" data-bs-toggle="modal" data-bs-target="#flashModal"></button>
-
         <div class="modal fade" id="flashModal" tabindex="-1" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
+            <div class="modal-content border-0 shadow-lg">
               <div class="modal-header bg-success text-white">
                 <h5 class="modal-title"><i class="bi bi-check-circle-fill me-1"></i> Success</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              <div class="modal-body">
-                {{ message }}
-              </div>
+              <div class="modal-body fw-semibold">{{ message }}</div>
             </div>
           </div>
         </div>
-
         <script>
-          document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('flashModalBtn').click();
-          });
+          // Ensure modal shows on page load if success flash message is present
+          document.addEventListener('DOMContentLoaded',()=>{document.getElementById('flashModalBtn').click();});
         </script>
       {% else %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        <div class="alert alert-{{ category }} alert-dismissible fade show mt-2" role="alert">
           {{ message }}
           <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
@@ -38,30 +211,75 @@
     {% endfor %}
   {% endwith %}
 
-  {# ───────────────────────── Indent Table ──────────────────────────────── #}
+  {# ───────────────────────── Combined Filter Section ────────────────────────────── #}
   {% if indent_data %}
   <div class="card shadow mb-4 border-0">
+    <div class="card-body py-4">
+      <div class="row align-items-center">
+
+        {# Status Filters #}
+        <div class="col-md-8 mb-3 mb-md-0">
+          <h6 class="mb-2 fw-bold"><i class="bi bi-funnel me-1 text-primary"></i> Filter by Status:</h6>
+          <div class="btn-group shadow-sm" role="group" id="status-filter-group">
+            <button type="button" class="btn btn-primary active" data-filter="all">All Indents</button>
+            <button type="button" class="btn btn-warning" data-filter="loading">Loading</button>
+            <button type="button" class="btn btn-info" data-filter="parking">Parking</button>
+            <button type="button" class="btn btn-success" data-filter="exit">Ready to Exit</button>
+          </div>
+        </div>
+
+        {# Date Filters (New Dropdown) #}
+        <div class="col-md-4 text-md-end">
+          <h6 class="mb-2 fw-bold"><i class="bi bi-calendar-check me-1 text-primary"></i> Filter by Date:</h6>
+          <div class="dropdown d-inline-block">
+            <button class="btn btn-secondary dropdown-toggle shadow-sm" type="button" id="dateFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false" data-current-date-filter="all">
+              All Dates
+            </button>
+            <ul class="dropdown-menu shadow-lg" aria-labelledby="dateFilterDropdown" id="date-filter-menu">
+              <li><a class="dropdown-item active" href="#" data-date-filter="all">All Dates</a></li>
+              <li><a class="dropdown-item" href="#" data-date-filter="today">Today</a></li>
+              <li><a class="dropdown-item" href="#" data-date-filter="week">This Week</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {# ───────────────────────── Uploaded Indent Table ──────────────────────────────── #}
+  {% if indent_data %}
+  <div class="card shadow-lg mb-4 border-0">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
       <h5 class="mb-0"><i class="bi bi-table me-2"></i> All Submitted Indents</h5>
-      <a href="{{ url_for('export_indents') }}" class="btn btn-light btn-sm">
+      <a href="{{ url_for('export_indents') }}" class="btn btn-light btn-sm shadow-sm">
         <i class="bi bi-file-earmark-arrow-down me-1"></i> Export to CSV
       </a>
     </div>
     <div class="card-body table-responsive">
-      <table class="table table-striped table-bordered align-middle">
+      <table class="table table-striped table-hover align-middle" id="indentTable">
         <thead class="table-dark">
           <tr>
             {% for key in indent_data[0].keys() %}
               <th>{{ key.replace('_',' ').title() }}</th>
             {% endfor %}
+            <th>Status</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="indentTableBody">
+          {# Assuming 'row.status' and 'row.indent_date' are available in your Jinja context #}
           {% for row in indent_data %}
-          <tr>
+          <tr data-status="{{ row.status | default('unknown') }}" data-date="{{ row.indent_date }}">
             {% for value in row.values() %}
               <td>{{ value }}</td>
             {% endfor %}
+            <td>
+              <button class="btn btn-outline-primary btn-sm track-status-btn"
+                      data-indent="{{ row['indent'] }}"
+                      data-vehicle="{{ row['vehicle_number'] }}">
+                <i class="bi bi-truck"></i> Track Status
+              </button>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -70,7 +288,7 @@
   </div>
   {% endif %}
 
-  {# ───────────────────────── Upload Card ──────────────────────────────── #}
+  {# ───────────────────────── Upload Excel/CSV Card ──────────────────────────────── #}
   <div class="card shadow mb-4 border-0">
     <div class="card-header bg-info text-white">
       <h5 class="mb-0"><i class="bi bi-upload me-2"></i> Upload Indent Excel/CSV</h5>
@@ -79,14 +297,12 @@
       <form method="post" action="{{ url_for('upload_indent') }}" enctype="multipart/form-data">
         <div class="row g-3 align-items-end">
           <div class="col-md-6">
-            <label class="form-label fw-semibold">
-              <i class="bi bi-file-earmark-spreadsheet me-1"></i>File
-            </label>
+            <label class="form-label fw-semibold"><i class="bi bi-file-earmark-spreadsheet me-1"></i> File</label>
             <input type="file" name="file" accept=".xlsx,.xls,.csv" required class="form-control shadow-sm" />
           </div>
           <div class="col-md-6">
-            <button type="submit" class="btn btn-info px-4">
-              <i class="bi bi-upload me-1"></i> Upload
+            <button type="submit" class="btn btn-info px-4 shadow-sm">
+              <i class="bi bi-upload me-1"></i> Upload Indent
             </button>
           </div>
         </div>
@@ -96,398 +312,109 @@
 
   {# ───────────────────────── Master Model Shortcut ────────────────────── #}
   <div class="mb-4 text-end">
-    <a href="{{ url_for('master_model') }}" class="btn btn-dark">
-      <i class="bi bi-box-seam me-1"></i> Master Model
+    <a href="{{ url_for('master_model') }}" class="btn btn-dark shadow-sm">
+      <i class="bi bi-box-seam me-1"></i> Master Model Settings
     </a>
   </div>
 
-  {# ───────────────────────── New Indent Form ──────────────────────────── #}
-  <div class="card shadow border-0">
+  {# ───────────────────────── Create New Indent ──────────────────────────── #}
+  <div class="card shadow-lg border-0">
     <div class="card-header bg-success text-white">
       <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i> Create New Indent</h5>
     </div>
     <div class="card-body">
       <form method="post" class="row g-4">
 
-        {# ── 1st Row ── #}
+        {# ── Indent General Info ── #}
         <div class="col-md-3">
-          <label class="form-label">
-            Indent Date
-            <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Date the indent was issued"></i>
-          </label>
-          <input type="date" name="indent_date" required class="form-control shadow-sm" />
+          <label class="form-label fw-semibold">Indent Date</label>
+          <input type="date" name="indent_date" class="form-control shadow-sm" required />
         </div>
         <div class="col-md-3">
-          <label class="form-label">
-            Indent #
-            <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Unique indent identifier"></i>
-          </label>
-          <input type="text" name="indent" required class="form-control shadow-sm" />
+          <label class="form-label fw-semibold">Indent #</label>
+          <input type="text" name="indent" class="form-control shadow-sm" required />
         </div>
         <div class="col-md-3">
-          <label class="form-label">
-            Allocation Date
-            <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Date when vehicle allocated"></i>
-          </label>
-          <input type="date" name="allocation_date" required class="form-control shadow-sm" />
+          <label class="form-label fw-semibold">Allocation Date</label>
+          <input type="date" name="allocation_date" class="form-control shadow-sm" />
         </div>
         <div class="col-md-3">
-          <label class="form-label">
-            Customer Name
-            <i class="bi bi-person" data-bs-toggle="tooltip" title="Consignee / Client"></i>
-          </label>
-          <input type="text" name="customer_name" required class="form-control shadow-sm" />
-        </div>
+          <label class="form-label fw-semibold">Pickup Location</label>
+          <select name="pickup_location" required class="form-control shadow-sm">
+              <option value="">Select Pickup Location</option>
+              <option value="Sonipat" selected>Sonipat</option>
+              <option value="Munirka ">Munirka </option>
+              <option value="Farukh_nagar">Farukh Nagar</option>
+              <option value="Lucknow">Lucknow</option>
 
-        {# ── 2nd Row ── #}
-        <div class="col-md-3">
-          <label class="form-label">
-            Range
-            <i class="bi bi-arrows-expand" data-bs-toggle="tooltip" title="Distance bucket in KM"></i>
-          </label>
-          <select name="range" id="rangeSelector" required class="form-select shadow-sm">
-            <option value="">-- Select Range --</option>
-            <option value="0-100">0‑100</option>
-            <option value="101-250">101‑250</option>
-            <option value="251-400">251‑400</option>
-            <option value="custom">Customize</option>
           </select>
         </div>
 
-        <div class="col-md-3">
-          <label class="form-label">
-            Pickup Location
-            <i class="bi bi-geo-alt" data-bs-toggle="tooltip" title="Starting location for the vehicle"></i>
-          </label>
-          <input type="text" name="pickup_location" value="Sonipat" required class="form-control shadow-sm" />
-        </div>
 
-        <div class="col-md-3">
-          <label class="form-label">
-            Location
-            <i class="bi bi-geo-alt" data-bs-toggle="tooltip" title="Loading / unloading point"></i>
-          </label>
-          <input type="text" name="location" required class="form-control shadow-sm" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            Vehicle Number
-            <i class="bi bi-truck" data-bs-toggle="tooltip" title="Select from fleet"></i>
-          </label>
-          <select name="vehicle_number" required class="form-select shadow-sm">
-            <option value="">-- Select Vehicle --</option>
-            {% for v in fleet_data %}
-              <option value="{{ v }}">{{ v }}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        {# ── 3rd Row ── #}
-        <div class="col-md-3">
-          <label class="form-label">
-            Vehicle Model
-            <i class="bi bi-card-list" data-bs-toggle="tooltip" title="Model or make of vehicle"></i>
-          </label>
-          <input type="text" name="vehicle_model" class="form-control shadow-sm" />
-        </div>
-        {% set tip = "City or base location of vehicle" %}
-        <div class="col-md-3">
-          <label class="form-label">
-            Vehicle Based
-            <i class="bi bi-building" data-bs-toggle="tooltip" title="{{ tip }}"></i>
-          </label>
-          <input type="text" name="vehicle_based" class="form-control shadow-sm" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            LR No.
-            <i class="bi bi-file-earmark-text" data-bs-toggle="tooltip" title="Lorry Receipt Number"></i>
-          </label>
-          <input type="text" name="lr_no" class="form-control shadow-sm" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            Material
-            <i class="bi bi-box" data-bs-toggle="tooltip" title="Cargo description"></i>
-          </label>
-          <input type="text" name="material" class="form-control shadow-sm" />
-        </div>
-
-        {# ── 4th Row ── #}
-        <div class="col-md-3">
-          <label class="form-label">
-            Load per Bucket/Barrels (Kg)
-            <i class="bi bi-bucket" data-bs-toggle="tooltip" title="Load per bucket"></i>
-          </label>
-          <input type="number" name="load_per_bucket" id="loadPerBucket" class="form-control shadow-sm" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            No. Buckets/Barrels
-            <i class="bi bi-collection" data-bs-toggle="tooltip" title="Total containers"></i>
-          </label>
-          <input type="number" name="no_of_buckets" id="noOfBuckets" class="form-control shadow-sm" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            Total Load (Kg)
-            <i class="bi bi-sliders" data-bs-toggle="tooltip" title="Total cargo weight"></i>
-          </label>
-          <input type="number" name="t_load" id="totalLoad" class="form-control shadow-sm" readonly />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            POD Received
-            <i class="bi bi-card-checklist" data-bs-toggle="tooltip" title="Proof of delivery received?"></i>
-          </label>
-          <select name="pod_received" class="form-select shadow-sm">
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
-        </div>
-
-        {# ── 5th Row ── #}
-        <div class="col-md-3">
-          <label class="form-label">
-            Freight Tiger No.
-            <i class="bi bi-hash" data-bs-toggle="tooltip" title="Tracking number"></i>
-          </label>
-          <input type="text" name="freight_tiger_number" class="form-control shadow-sm" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            Freight Tiger Month
-            <i class="bi bi-calendar" data-bs-toggle="tooltip" title="Month of Freight Tiger invoice"></i>
-          </label>
-          <input type="month" name="freight_tiger_month" class="form-control shadow-sm" />
-        </div>
-
-        {# ── Submit ── #}
-        <div class="col-12 text-end">
-          <button type="submit" class="btn btn-success px-5 mt-3">
-            <i class="bi bi-plus-circle me-1"></i> Create Indent
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-</div>
-
-{# ── Enable tooltips site‑wide ── #}
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle=\"tooltip\"]'));
-    tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
-  });
-</script>
-
-<script>
-    const rangeSelector = document.getElementById('rangeSelector');
-    const customInputDiv = document.getElementById('customRangeInput');
-    const customRangeInput = document.getElementById('customRange');
-
-    rangeSelector.addEventListener('change', function () {
-      if (this.value === 'custom') {
-        customInputDiv.style.display = 'block';
-        customRangeInput.required = true;
-      } else {
-        customInputDiv.style.display = 'none';
-        customRangeInput.required = false;
-      }
-    });
-  </script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const loadPerBucket = document.getElementById('loadPerBucket');
-      const noOfBuckets = document.getElementById('noOfBuckets');
-      const totalLoad = document.getElementById('totalLoad');
-
-      function calculateTotalLoad() {
-        const load = parseFloat(loadPerBucket.value) || 0;
-        const buckets = parseFloat(noOfBuckets.value) || 0;
-        totalLoad.value = load * buckets;
-      }
-
-      loadPerBucket.addEventListener('input', calculateTotalLoad);
-      noOfBuckets.addEventListener('input', calculateTotalLoad);
-    });
-  </script>
-
-
-
-
-{% endblock %}
-=======
-{% extends "layout.html" %}
-
-{% block content %}
-<div class="container-fluid">
-
-  {# ───────────────────────── Flash Modal (Success Only) ───────────────────── #}
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, message in messages %}
-      {% if category == 'success' %}
-        <!-- Hidden button to trigger modal -->
-        <button type="button" class="d-none" id="flashModalBtn" data-bs-toggle="modal" data-bs-target="#flashModal"></button>
-
-        <!-- Modal -->
-        <div class="modal fade" id="flashModal" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header bg-success text-white">
-                <h5 class="modal-title"><i class="bi bi-check-circle-fill me-1"></i> Success</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        {# ───────────── Customer Sections ───────────── #}
+        <div class="col-12 mt-3">
+          <label class="form-label fs-5 fw-bold text-secondary">Customer Details</label>
+          <div id="customerSectionContainer">
+            <div class="customer-block border rounded p-4 mb-3 shadow-sm">
+              <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                <h6 class="text-primary fw-bold mb-0">Customer #1</h6>
+                <button type="button" class="btn btn-danger btn-sm removeCustomer d-none">
+                  <i class="bi bi-trash"></i> Remove Customer
+                </button>
               </div>
-              <div class="modal-body">
-                {{ message }}
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label class="form-label">Customer Name</label>
+                  <input type="text" name="customers[0][name]" class="form-control shadow-sm" required />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Range</label>
+                  <select name="customers[0][range]" class="form-select shadow-sm" required>
+                    <option value="">-- Select Range --</option>
+                    <option value="0-100">0-100</option>
+                    <option value="101-250">101-250</option>
+                    <option value="251-400">251-400</option>
+                    <option value="custom">Customize</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Drop Location</label>
+                  <input type="text" name="customers[0][drop_location]" class="form-control shadow-sm" required />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">LR No.</label>
+                  <input type="text" name="customers[0][lr_no]" class="form-control shadow-sm" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Material</label>
+                  <input type="text" name="customers[0][material]" class="form-control shadow-sm" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Load per Bucket (Kg)</label>
+                  <input type="number" name="customers[0][load_per_bucket]" class="form-control shadow-sm loadPerBucketInput" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">No. Buckets</label>
+                  <input type="number" name="customers[0][no_of_buckets]" class="form-control shadow-sm noOfBucketsInput" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label fw-bold text-success">Total Load (Kg)</label>
+                  <input type="number" name="customers[0][total_load]" class="form-control shadow-sm totalLoadInput bg-light" readonly />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Auto‑trigger the modal -->
-        <script>
-          document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('flashModalBtn').click();
-          });
-        </script>
-      {% else %}
-        <!-- Non‑success categories render inline alerts -->
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      {% endif %}
-    {% endfor %}
-  {% endwith %}
-
-  {# ───────────────────────── Indent Table ──────────────────────────────── #}
-  {% if indent_data %}
-  <div class="card shadow mb-4 border-0">
-    <div class="card-header bg-primary text-white">
-      <h5 class="mb-0"><i class="bi bi-table me-2"></i> All Submitted Indents</h5>
-    </div>
-    <div class="card-body table-responsive">
-      <table class="table table-striped table-bordered align-middle">
-        <thead class="table-dark">
-          <tr>
-            {% for key in indent_data[0].keys() %}
-              <th>{{ key.replace('_',' ').title() }}</th>
-            {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for row in indent_data %}
-          <tr>
-            {% for value in row.values() %}
-              <td>{{ value }}</td>
-            {% endfor %}
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-  {% endif %}
-
-  {# ───────────────────────── Upload Card ──────────────────────────────── #}
-  <div class="card shadow mb-4 border-0">
-    <div class="card-header bg-info text-white">
-      <h5 class="mb-0"><i class="bi bi-upload me-2"></i> Upload Indent Excel/CSV</h5>
-    </div>
-    <div class="card-body">
-      <form method="post" action="{{ url_for('upload_indent') }}" enctype="multipart/form-data">
-        <div class="row g-3 align-items-end">
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">
-              <i class="bi bi-file-earmark-spreadsheet me-1"></i>File
-            </label>
-            <input type="file" name="file" accept=".xlsx,.xls,.csv" required class="form-control shadow-sm" />
-          </div>
-          <div class="col-md-6">
-            <button type="submit" class="btn btn-info px-4">
-              <i class="bi bi-upload me-1"></i> Upload
+          <div class="text-end">
+            <button type="button" class="btn btn-outline-primary mt-2 shadow-sm" id="addCustomerBtn">
+              <i class="bi bi-plus-circle"></i> Add Another Customer
             </button>
           </div>
         </div>
-      </form>
-    </div>
-  </div>
 
-  {# ───────────────────────── Master Model Shortcut ────────────────────── #}
-  <div class="mb-4 text-end">
-    <a href="{{ url_for('master_model') }}" class="btn btn-dark">
-      <i class="bi bi-box-seam me-1"></i> Master Model
-    </a>
-  </div>
-
-  {# ───────────────────────── New Indent Form ──────────────────────────── #}
-  <div class="card shadow border-0">
-    <div class="card-header bg-success text-white">
-      <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i> Create New Indent</h5>
-    </div>
-    <div class="card-body">
-      <form method="post" class="row g-4">
-
-        {# ── 1st Row ── #}
+        {# ───────────── Vehicle & Other Info ───────────── #}
+        <div class="col-12"><h5 class="fw-bold text-secondary border-bottom pb-2">Vehicle Assignment & POD</h5></div>
         <div class="col-md-3">
-          <label class="form-label">
-            Indent Date
-            <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Date the indent was issued"></i>
-          </label>
-          <input type="date" name="indent_date" required class="form-control shadow-sm" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            Indent #
-            <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Unique indent identifier"></i>
-          </label>
-          <input type="text" name="indent" required class="form-control shadow-sm" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            Allocation Date
-            <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Date when vehicle allocated"></i>
-          </label>
-          <input type="date" name="allocation_date" required class="form-control shadow-sm" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            Customer Name
-            <i class="bi bi-person" data-bs-toggle="tooltip" title="Consignee / Client"></i>
-          </label>
-          <input type="text" name="customer_name" required class="form-control shadow-sm" />
-        </div>
-
-        {# ── 2nd Row ── #}
-        <div class="col-md-3">
-          <label class="form-label">
-            Range
-            <i class="bi bi-arrows-expand" data-bs-toggle="tooltip" title="Distance bucket in KM"></i>
-          </label>
-          <select name="range" id="rangeSelector" required class="form-select shadow-sm">
-            <option value="">-- Select Range --</option>
-            <option value="0-100">0‑100</option>
-            <option value="101-250">101‑250</option>
-            <option value="251-400">251‑400</option>
-            <option value="custom">Customize</option>
-          </select>
-        </div>
-
-        <div class="col-md-3">
-          <label class="form-label">
-            Location
-            <i class="bi bi-geo-alt" data-bs-toggle="tooltip" title="Loading / unloading point"></i>
-          </label>
-          <input type="text" name="location" required class="form-control shadow-sm" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            Vehicle Number
-            <i class="bi bi-truck" data-bs-toggle="tooltip" title="Select from fleet"></i>
-          </label>
+          <label class="form-label fw-semibold">Vehicle Number</label>
           <select name="vehicle_number" required class="form-select shadow-sm">
             <option value="">-- Select Vehicle --</option>
             {% for v in fleet_data %}
@@ -496,141 +423,405 @@
           </select>
         </div>
         <div class="col-md-3">
-          <label class="form-label">
-            Vehicle Model
-            <i class="bi bi-card-list" data-bs-toggle="tooltip" title="Model or make of vehicle"></i>
-          </label>
+          <label class="form-label fw-semibold">Vehicle Model</label>
           <input type="text" name="vehicle_model" class="form-control shadow-sm" />
         </div>
-
-        {# ── 3rd Row ── #}
-        {% set tip = "City or base location of vehicle" %}
         <div class="col-md-3">
-          <label class="form-label">
-            Vehicle Based
-            <i class="bi bi-building" data-bs-toggle="tooltip" title="{{ tip }}"></i>
-          </label>
+          <label class="form-label fw-semibold">Vehicle Based</label>
           <input type="text" name="vehicle_based" class="form-control shadow-sm" />
         </div>
         <div class="col-md-3">
-          <label class="form-label">
-            LR No.
-            <i class="bi bi-file-earmark-text" data-bs-toggle="tooltip" title="Lorry Receipt Number"></i>
-          </label>
-          <input type="text" name="lr_no" class="form-control shadow-sm" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            Material
-            <i class="bi bi-box" data-bs-toggle="tooltip" title="Cargo description"></i>
-          </label>
-          <input type="text" name="material" class="form-control shadow-sm" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            Load per Bucket/Barrels (Kg)
-            <i class="bi bi-bucket" data-bs-toggle="tooltip" title="Load per bucket"></i>
-          </label>
-          <input type="number" name="load_per_bucket" id="loadPerBucket" class="form-control shadow-sm" />
-        </div>
-
-        {# ── 4th Row ── #}
-        <div class="col-md-3">
-          <label class="form-label">
-            No. Buckets/Barrels
-            <i class="bi bi-collection" data-bs-toggle="tooltip" title="Total containers"></i>
-          </label>
-          <input type="number" name="no_of_buckets" id="noOfBuckets" class="form-control shadow-sm" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            Total Load (Kg)
-            <i class="bi bi-sliders" data-bs-toggle="tooltip" title="Total cargo weight"></i>
-          </label>
-          <input type="number" name="t_load" id="totalLoad" class="form-control shadow-sm" readonly />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">
-            POD Received
-            <i class="bi bi-card-checklist" data-bs-toggle="tooltip" title="Proof of delivery received?"></i>
-          </label>
+          <label class="form-label fw-semibold">POD Received</label>
           <select name="pod_received" class="form-select shadow-sm">
             <option value="Yes">Yes</option>
             <option value="No">No</option>
           </select>
         </div>
         <div class="col-md-3">
-          <label class="form-label">
-            Freight Tiger No.
-            <i class="bi bi-hash" data-bs-toggle="tooltip" title="Tracking number"></i>
-          </label>
+          <label class="form-label fw-semibold">Freight Tiger No.</label>
           <input type="text" name="freight_tiger_number" class="form-control shadow-sm" />
         </div>
-
-        {# ── 5th Row ── #}
         <div class="col-md-3">
-          <label class="form-label">
-            Freight Tiger Month
-            <i class="bi bi-calendar" data-bs-toggle="tooltip" title="Month of Freight Tiger invoice"></i>
-          </label>
+          <label class="form-label fw-semibold">Freight Tiger Month</label>
           <input type="month" name="freight_tiger_month" class="form-control shadow-sm" />
         </div>
-
-        {# ── Submit ── #}
         <div class="col-12 text-end">
-          <button type="submit" class="btn btn-success px-5 mt-3">
+          <button type="submit" class="btn btn-success px-5 py-2 mt-3 shadow-lg">
             <i class="bi bi-plus-circle me-1"></i> Create Indent
           </button>
         </div>
       </form>
     </div>
   </div>
-
 </div>
 
-{# ── Enable tooltips site‑wide ── #}
+{# ───────────────────── Vehicle Status Tracker Modal ───────────────────── #}
+<div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-secondary text-white">
+        <h5 class="modal-title"><i class="bi bi-truck me-2"></i> Vehicle Status Tracker: <span id="modalVehicleID" class="fw-bold text-warning"></span></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <h6 class="mb-3">Indent: <span id="modalIndentID" class="text-primary fw-bold"></span></h6>
+        <div class="progress my-4" style="height: 32px;">
+          <div id="statusProgress" class="progress-bar progress-bar-striped progress-bar-animated bg-info" style="width: 0%;">
+            Waiting to Start...
+          </div>
+        </div>
+        <div class="row text-center mt-5">
+          <div class="col">
+            <i class="bi bi-box2-fill fs-3 text-warning"></i>
+            <p class="fw-semibold mb-0">Loading</p>
+            <small id="loadTime" class="text-muted">–</small>
+          </div>
+          <div class="col">
+            <i class="bi bi-p-square-fill fs-3 text-primary"></i>
+            <p class="fw-semibold mb-0">Parking</p>
+            <small id="parkTime" class="text-muted">–</small>
+          </div>
+          <div class="col">
+            <i class="bi bi-door-open-fill fs-3 text-success"></i>
+            <p class="fw-semibold mb-0">Ready to Exit</p>
+            <small id="exitTime" class="text-muted">–</small>
+          </div>
+        </div>
+        <div class="text-center mt-5 pt-3 border-top">
+          <button class="btn btn-outline-warning me-2 fw-semibold" id="btnLoading" data-status="loading"><i class="bi bi-box2"></i> Start Loading</button>
+          <button class="btn btn-outline-primary me-2 fw-semibold" id="btnParking" data-status="parking" disabled><i class="bi bi-p-square"></i> Move to Parking</button>
+          <button class="btn btn-outline-success fw-semibold" id="btnExit" data-status="exit" disabled><i class="bi bi-door-open"></i> Ready to Exit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ───────────────────────────── Optimized JavaScript Section (NO LOGIC CHANGE) ───────────────────────────── #}
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle=\"tooltip\"]'));
-    tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
+document.addEventListener("DOMContentLoaded", function () {
+  // --- DOM Elements for Status Tracker ---
+  const statusModal = new bootstrap.Modal(document.getElementById("statusModal"));
+  const progressBar = document.getElementById("statusProgress");
+  const modalVehicleID = document.getElementById("modalVehicleID");
+  const modalIndentID = document.getElementById("modalIndentID");
+  const loadTime = document.getElementById("loadTime");
+  const parkTime = document.getElementById("parkTime");
+  const exitTime = document.getElementById("exitTime");
+  const btnLoading = document.getElementById("btnLoading");
+  const btnParking = document.getElementById("btnParking");
+  const btnExit = document.getElementById("btnExit");
+  const trackBtns = document.querySelectorAll(".track-status-btn");
+
+  // --- Global Filter Elements ---
+  const filterGroupStatus = document.getElementById('status-filter-group');
+  const filterGroupDate = document.getElementById('date-filter-menu');
+  const dateFilterDropdownBtn = document.getElementById('dateFilterDropdown');
+  const tableRows = document.querySelectorAll('#indentTableBody tr');
+
+
+  // ------------------- NEW IST CONVERSION LOGIC -------------------
+
+  // --- Utility: Convert Timestamp to IST (Client-Side) ---
+  function convertToIST(timestamp) {
+    if (!timestamp) return null;
+    try {
+        // Replace space with 'T' and append 'Z' to treat as UTC
+        const utcStr = timestamp.includes("T") ? timestamp : timestamp.replace(" ", "T") + "Z";
+        const date = new Date(utcStr);
+
+        const options = {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true,
+            timeZone: "Asia/Kolkata",
+        };
+        return date.toLocaleString("en-IN", options);
+    } catch (e) {
+        console.error("IST Conversion Error:", e, timestamp);
+        return timestamp;
+    }
+}
+
+
+          // Format the date to a localized time string
+          return date.toLocaleTimeString('en-IN', options);
+      } catch (e) {
+          console.error("Error converting time to IST:", e);
+          return utcTimestamp; // Return original if conversion fails
+      }
+  }
+  // ------------------- END NEW IST CONVERSION LOGIC -------------------
+
+
+  // --- Utility: Update Progress Bar and Buttons ---
+  function updateModalUI(status, loadT, parkT, exitT) {
+    let width = '0%', barClass = 'bg-info', barText = 'Waiting to Start...';
+    let loadingDisabled = false, parkingDisabled = true, exitDisabled = true;
+
+    if (status === "loading") {
+      width = '33%';
+      barClass = 'bg-warning';
+      barText = 'Loading in Progress...';
+      loadingDisabled = true;
+      parkingDisabled = false;
+    } else if (status === "parking") {
+      width = '66%';
+      barClass = 'bg-primary';
+      barText = 'Vehicle Parked...';
+      loadingDisabled = true;
+      parkingDisabled = true;
+      exitDisabled = false;
+    } else if (status === "exit") {
+      width = '100%';
+      barClass = 'bg-success';
+      barText = 'Exit Completed!';
+      loadingDisabled = true;
+      parkingDisabled = true;
+      exitDisabled = true;
+    }
+
+    // NOTE: loadT, parkT, exitT are now expected to be IST formatted strings
+    loadTime.textContent = loadT || "–";
+    parkTime.textContent = parkT || "–";
+    exitTime.textContent = exitT || "–";
+    progressBar.style.width = width;
+
+    // IMPORTANT: Ensure the class names here match the custom styles or standard bootstrap colors
+    let finalBarClass = '';
+    if (barClass === 'bg-warning') {
+        finalBarClass = 'bg-warning'; // Gold/Yellow (Matches theme accent)
+    } else if (barClass === 'bg-primary') {
+        finalBarClass = 'bg-info'; // Use a standard blue/info for parking
+    } else if (barClass === 'bg-success') {
+        finalBarClass = 'bg-success'; // Green
+    } else {
+        finalBarClass = 'bg-secondary'; // Default
+    }
+
+    progressBar.className = `progress-bar progress-bar-striped progress-bar-animated ${finalBarClass}`;
+    progressBar.textContent = barText;
+    btnLoading.disabled = loadingDisabled;
+    btnParking.disabled = parkingDisabled;
+    btnExit.disabled = exitDisabled;
+  }
+
+  // --- API Call: Fetch Status (NO LOGIC CHANGE) ---
+  async function fetchStatus(indent, vehicle) {
+    const res = await fetch(`/get_status?indent=${indent}&vehicle=${vehicle}`);
+    return res.json();
+  }
+
+  // --- API Call: Update Status (NO LOGIC CHANGE) ---
+  async function updateStatus(status) {
+    const indent = modalIndentID.textContent;
+    const vehicle = modalVehicleID.textContent;
+    const res = await fetch("/update_status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ indent, vehicle, status }),
+    });
+    const data = await res.json();
+    return data;
+  }
+
+  // --- Event: Track Button Click (NO LOGIC CHANGE) ---
+  trackBtns.forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const indent = btn.getAttribute("data-indent");
+      const vehicle = btn.getAttribute("data-vehicle");
+
+      modalIndentID.textContent = indent;
+      modalVehicleID.textContent = vehicle;
+
+      // Reset and fetch status
+      updateModalUI(null, null, null, null); // Initial reset
+      const data = await fetchStatus(indent, vehicle);
+
+      // Convert UTC times (from server) to IST before updating UI
+      const istLoadingTime = convertToIST(data.loading_time);
+      const istParkingTime = convertToIST(data.parking_time);
+      const istExitTime = convertToIST(data.exit_time);
+
+      // Update UI based on fetched status using IST times
+      updateModalUI(data.status, istLoadingTime, istParkingTime, istExitTime);
+
+      statusModal.show();
+    });
   });
+
+  // --- Event: Status Update Button Clicks (Delegated Handlers - NO LOGIC CHANGE) ---
+  btnLoading.addEventListener("click", async () => {
+    const data = await updateStatus("loading");
+    // Convert new timestamp to IST
+    const istTime = convertToIST(data.timestamp);
+    updateModalUI("loading", istTime, null, null);
+  });
+
+  btnParking.addEventListener("click", async () => {
+    const data = await updateStatus("parking");
+    // Convert new timestamp to IST
+    const istTime = convertToIST(data.timestamp);
+    // Preserve old loading time, update parking time
+    updateModalUI("parking", loadTime.textContent, istTime, null);
+  });
+
+  btnExit.addEventListener("click", async () => {
+    const data = await updateStatus("exit");
+    // Convert new timestamp to IST
+    const istTime = convertToIST(data.timestamp);
+    // Preserve old times, update exit time
+    updateModalUI("exit", loadTime.textContent, parkTime.textContent, istTime);
+  });
+
+
+  // ------------------- Customer Form Logic (NO LOGIC CHANGE) -------------------
+
+  const container = document.getElementById("customerSectionContainer");
+  const addBtn = document.getElementById("addCustomerBtn");
+
+  function updateLabels() {
+    const blocks = container.querySelectorAll(".customer-block");
+    blocks.forEach((block, i) => {
+      // Update title
+      block.querySelector("h6").textContent = `Customer #${i + 1}`;
+      // Update form names
+      block.querySelectorAll("input, select").forEach(input => {
+        const name = input.getAttribute("name");
+        // Regex to update the array index in the name attribute, e.g., 'customers[0][name]' -> 'customers[i][name]'
+        input.setAttribute("name", name.replace(/\[\d+\]/, `[${i}]`));
+      });
+      // Show remove button for all customers except the first one
+      if (i > 0) {
+        block.querySelector(".removeCustomer").classList.remove("d-none");
+      } else {
+        block.querySelector(".removeCustomer").classList.add("d-none");
+      }
+    });
+  }
+
+  // Initial check for the first customer's remove button (ensure it's hidden)
+  updateLabels();
+
+  addBtn.addEventListener("click", () => {
+    const newBlock = container.firstElementChild.cloneNode(true);
+    // Clear values in cloned block
+    newBlock.querySelectorAll("input, select").forEach(input => { input.value = ""; });
+    container.appendChild(newBlock);
+    updateLabels(); // Update all labels/names/remove buttons
+  });
+
+  container.addEventListener("click", e => {
+    if (e.target.closest(".removeCustomer")) {
+      e.target.closest(".customer-block").remove();
+      updateLabels(); // Recalculate and update indices/labels after removal
+    }
+  });
+
+  // Event Delegation for Total Load Calculation
+  container.addEventListener("input", e => {
+    if (e.target.classList.contains("loadPerBucketInput") || e.target.classList.contains("noOfBucketsInput")) {
+      const block = e.target.closest(".customer-block");
+      const loadInput = block.querySelector(".loadPerBucketInput");
+      const bucketsInput = block.querySelector(".noOfBucketsInput");
+      const totalLoadInput = block.querySelector(".totalLoadInput");
+
+      const load = parseFloat(loadInput.value) || 0;
+      const buckets = parseFloat(bucketsInput.value) || 0;
+
+      // Calculate and set total load
+      totalLoadInput.value = (load * buckets).toFixed(2); // Use toFixed(2) for better number handling
+    }
+  });
+
+
+  // ------------------- Combined Filter Logic (NO LOGIC CHANGE) -------------------
+
+  // Helper to format a date as YYYY-MM-DD (matches input[type=date] and data-date)
+  const formatDate = (date) => date.toISOString().split('T')[0];
+
+  // Helper to calculate the start of the current week (Sunday)
+  const getStartOfWeek = (date) => {
+    const d = new Date(date);
+    const day = d.getDay(); // 0 is Sunday, 1 is Monday...
+    const diff = d.getDate() - day;
+    d.setDate(diff);
+    return formatDate(d);
+  };
+
+  // Master function to apply both Status and Date filters
+  function applyFilters() {
+    const currentStatusFilter = filterGroupStatus.querySelector('.active').dataset.filter;
+    const currentDateFilter = dateFilterDropdownBtn.dataset.currentDateFilter;
+    const todayDate = formatDate(new Date());
+    const startOfWeek = getStartOfWeek(new Date());
+
+    tableRows.forEach(row => {
+      const rowStatus = row.getAttribute('data-status');
+      const rowDate = row.getAttribute('data-date'); // This must be in 'YYYY-MM-DD' format
+
+      // 1. Check Status Filter
+      const statusMatch = currentStatusFilter === 'all' || rowStatus === currentStatusFilter;
+
+      // 2. Check Date Filter
+      let dateMatch = false;
+      if (currentDateFilter === 'all') {
+        dateMatch = true;
+      } else if (currentDateFilter === 'today') {
+        dateMatch = rowDate === todayDate;
+      } else if (currentDateFilter === 'week') {
+        // Date check: Is rowDate >= startOfWeek (if rowDate is valid)
+        dateMatch = rowDate >= startOfWeek;
+      }
+
+      // 3. Apply combined filter
+      if (statusMatch && dateMatch) {
+        row.style.display = ''; // Show row
+      } else {
+        row.style.display = 'none'; // Hide row
+      }
+    });
+  }
+
+  // Event: Status Button Click
+  if (filterGroupStatus) {
+    filterGroupStatus.addEventListener('click', (e) => {
+      const target = e.target.closest('button');
+      if (!target || !target.dataset.filter) return;
+
+      // Update active button
+      filterGroupStatus.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+      target.classList.add('active');
+
+      applyFilters(); // Re-run combined filter
+    });
+  }
+
+  // Event: Date Dropdown Item Click
+  if (filterGroupDate) {
+    filterGroupDate.addEventListener('click', (e) => {
+      const target = e.target.closest('a');
+      if (!target || !target.dataset.dateFilter) return;
+
+      // Update active item in dropdown
+      filterGroupDate.querySelectorAll('.dropdown-item').forEach(item => item.classList.remove('active'));
+      target.classList.add('active');
+
+      // Update dropdown button text and data attribute
+      dateFilterDropdownBtn.textContent = target.textContent;
+      dateFilterDropdownBtn.dataset.currentDateFilter = target.dataset.dateFilter;
+
+      applyFilters(); // Re-run combined filter
+    });
+  }
+
+  // Initial application of filter (will show all by default)
+  applyFilters();
+});
 </script>
 
-<script>
-    const rangeSelector = document.getElementById('rangeSelector');
-    const customInputDiv = document.getElementById('customRangeInput');
-    const customRangeInput = document.getElementById('customRange');
-
-    rangeSelector.addEventListener('change', function () {
-      if (this.value === 'custom') {
-        customInputDiv.style.display = 'block';
-        customRangeInput.required = true;
-      } else {
-        customInputDiv.style.display = 'none';
-        customRangeInput.required = false;
-      }
-    });
-  </script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const loadPerBucket = document.getElementById('loadPerBucket');
-      const noOfBuckets = document.getElementById('noOfBuckets');
-      const totalLoad = document.getElementById('totalLoad');
-
-      function calculateTotalLoad() {
-        const load = parseFloat(loadPerBucket.value) || 0;
-        const buckets = parseFloat(noOfBuckets.value) || 0;
-        totalLoad.value = load * buckets;
-      }
-
-      loadPerBucket.addEventListener('input', calculateTotalLoad);
-      noOfBuckets.addEventListener('input', calculateTotalLoad);
-    });
-  </script>
-
-
-
-
 {% endblock %}
->>>>>>> 40c2f3a2a5a30ae7630fc05918625d6143f376f8

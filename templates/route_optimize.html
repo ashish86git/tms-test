@@ -1,249 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Optimized Delivery Routes</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-  <style>
-    /* Reset */
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #f4f6fa;
-      margin: 0;
-      padding: 40px 20px;
-      color: #2a3a4a;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    h1 {
-      font-weight: 700;
-      text-align: center;
-      font-size: 2.6rem;
-      margin-bottom: 40px;
-      color: #102a43;
-      letter-spacing: 0.03em;
-    }
+{% extends "layout.html" %}
 
-    .filters {
-      max-width: 900px;
-      margin: 0 auto 50px;
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .filters input[type="text"],
-    .filters select {
-      flex: 1 1 250px;
-      padding: 12px 18px;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 1.8px solid #d1d9e6;
-      background-color: #fff;
-      transition: border-color 0.3s ease;
-      color: #334e68;
-      box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
-      outline-offset: 2px;
-      cursor: pointer;
-    }
-    .filters input[type="text"]:focus,
-    .filters select:focus {
-      border-color: #3b82f6; /* nice blue */
-      box-shadow: 0 0 6px rgba(59,130,246,0.5);
-      outline: none;
-    }
+{% block content %}
+<div class="container-fluid mt-4">
+  <h2 class="mb-4 text-dark" style="font-weight:600;">Latest Indents Route Optimization</h2>
 
-    #routesContainer {
-      max-width: 900px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
-      gap: 30px;
-    }
+  {% if indents_data %}
+    {% for indent in indents_data %}
+    <div class="card shadow-sm border-0 mb-4 p-3"
+         style="background: linear-gradient(135deg,#fcebeb 0%,var(--primary-maroon)100%); color:var(--text-dark); border-radius:12px;">
 
-    .route-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow:
-        0 2px 8px rgb(0 0 0 / 0.1),
-        0 10px 15px rgb(0 0 0 / 0.05);
-      padding: 25px 30px;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      cursor: default;
-    }
-    .route-card:hover {
-      transform: translateY(-5px);
-      box-shadow:
-        0 12px 20px rgb(0 0 0 / 0.15),
-        0 20px 40px rgb(0 0 0 / 0.1);
-    }
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">
+          Indent ID:
+          <span class="badge bg-warning text-dark">{{ indent.indent_id }}</span>
+        </h5>
+        <span class="badge bg-success">Vehicle: {{ indent.vehicle }}</span>
+      </div>
 
-    .route-header {
-      font-weight: 700;
-      font-size: 1.3rem;
-      color: #1e2a38;
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+      <div class="row">
 
-    .route-info {
-      font-size: 1rem;
-      color: #455a64;
-      margin-bottom: 12px;
-      line-height: 1.4;
-    }
+        <!-- START / PICKUP -->
+        <div class="col-md-3">
+          <h6>Start (Pickup)</h6>
+          <p class="mb-1"><i class="bi bi-geo-alt-fill"></i> {{ indent.auto_route[0] }}</p>
 
-    .orders-list {
-      background: #e1e8f7;
-      padding: 12px 16px;
-      border-radius: 10px;
-      color: #2a3a4a;
-      font-weight: 600;
-      font-size: 1rem;
-      letter-spacing: 0.01em;
-      margin-bottom: 20px;
-      word-wrap: break-word;
-    }
-
-    a.map-link {
-      align-self: flex-start;
-      text-decoration: none;
-      color: #2563eb;
-      font-weight: 700;
-      border: 2px solid #2563eb;
-      padding: 10px 18px;
-      border-radius: 12px;
-      box-shadow: 0 6px 10px rgb(37 99 235 / 0.15);
-      transition:
-        background-color 0.3s ease,
-        color 0.3s ease,
-        box-shadow 0.3s ease;
-      user-select: none;
-    }
-    a.map-link:hover {
-      background-color: #2563eb;
-      color: white;
-      box-shadow: 0 12px 18px rgb(37 99 235 / 0.3);
-    }
-
-    .no-routes {
-      max-width: 600px;
-      margin: 120px auto;
-      font-size: 1.4rem;
-      color: #9aa5b1;
-      text-align: center;
-      font-style: italic;
-    }
-
-    /* Responsive tweaks */
-    @media (max-width: 480px) {
-      .filters {
-        flex-direction: column;
-      }
-      .route-header {
-        flex-direction: column;
-        gap: 4px;
-      }
-      a.map-link {
-        width: 100%;
-        text-align: center;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <h1>Optimized Delivery Routes</h1>
-
-  <div class="filters">
-    <input type="text" id="searchInput" placeholder="Search by Vehicle, Driver or Order ID" autocomplete="off" />
-    <select id="vehicleFilter">
-      <option value="">All Vehicles</option>
-      {% set vehicles = routes | map(attribute='vehicle') | unique | list %}
-      {% for vehicle in vehicles %}
-        <option value="{{ vehicle }}">{{ vehicle }}</option>
-      {% endfor %}
-    </select>
-    <select id="driverFilter">
-      <option value="">All Drivers</option>
-      {% set drivers = routes | map(attribute='driver') | unique | list %}
-      {% for driver in drivers %}
-        <option value="{{ driver }}">{{ driver }}</option>
-      {% endfor %}
-    </select>
-  </div>
-
-  <div id="routesContainer">
-    {% if routes %}
-      {% for route in routes %}
-        <div class="route-card"
-             data-vehicle="{{ route.vehicle | lower }}"
-             data-driver="{{ route.driver | lower }}"
-             data-orders="{{ route.orders | join(',') | lower }}">
-          <div class="route-header">
-            <span>🚚 Vehicle: {{ route.vehicle }}</span>
-            <span>👨‍✈️ Driver: {{ route.driver }}</span>
-          </div>
-
-          <div class="route-info"><strong>Assigned Orders:</strong></div>
-          <div class="orders-list">{{ route.orders | join(', ') }}</div>
-
-          <div class="route-info"><strong>Total Distance:</strong> {{ route.distance_km }} km</div>
-          <div class="route-info"><strong>Suggested Delivery Window:</strong> {{ route.suggested_delivery_window }}</div>
-          <div class="route-info"><strong>Estimated Travel Time:</strong> {{ route.estimated_travel_time_hrs }} hours</div>
-          <div class="route-info"><strong>Estimated Fuel Consumption:</strong> {{ route.estimated_fuel_liters }} liters</div>
-
-          <a class="map-link" href="{{ url_for('static', filename=route.map_url.split('static/')[1]) }}" target="_blank" rel="noopener noreferrer" aria-label="View route map for vehicle {{ route.vehicle }}">
-            View Route Map
-          </a>
+          {% if indent.estimated_arrival and indent.estimated_arrival[0] %}
+            <span class="badge bg-info text-dark">
+              {{ indent.estimated_arrival[0].strftime("%d-%b %I:%M %p") }}
+            </span>
+          {% else %}
+            <span class="badge bg-secondary text-dark">–</span>
+          {% endif %}
         </div>
-      {% endfor %}
-    {% else %}
-      <div class="no-routes">No optimized routes found. Please check your data and try again.</div>
-    {% endif %}
-  </div>
 
-  <script>
-    const searchInput = document.getElementById('searchInput');
-    const vehicleFilter = document.getElementById('vehicleFilter');
-    const driverFilter = document.getElementById('driverFilter');
-    const routesContainer = document.getElementById('routesContainer');
-    const routeCards = routesContainer.querySelectorAll('.route-card');
+        <!-- DROPS + END POINT -->
+        <div class="col-md-6">
+          <h6>Drop Locations & ETA</h6>
+          <ul class="list-unstyled mb-0">
 
-    function filterRoutes() {
-      const searchText = searchInput.value.trim().toLowerCase();
-      const selectedVehicle = vehicleFilter.value.toLowerCase();
-      const selectedDriver = driverFilter.value.toLowerCase();
+            {% for i in range(1, indent.auto_route|length) %}
+              <li class="mb-1">
 
-      routeCards.forEach(card => {
-        const vehicle = card.dataset.vehicle;
-        const driver = card.dataset.driver;
-        const orders = card.dataset.orders;
+                {% set is_last = (i == indent.auto_route|length - 1) %}
 
-        const matchesSearch = vehicle.includes(searchText) || driver.includes(searchText) || orders.includes(searchText);
-        const matchesVehicle = !selectedVehicle || vehicle === selectedVehicle;
-        const matchesDriver = !selectedDriver || driver === selectedDriver;
+                {% if is_last %}
+                  <strong><i class="bi bi-flag-fill text-dark"></i> End Point:</strong>
+                {% else %}
+                  <i class="bi bi-geo-alt-fill"></i>
+                {% endif %}
 
-        if (matchesSearch && matchesVehicle && matchesDriver) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    }
+                {{ indent.auto_route[i] }} —
 
-    searchInput.addEventListener('input', filterRoutes);
-    vehicleFilter.addEventListener('change', filterRoutes);
-    driverFilter.addEventListener('change', filterRoutes);
-  </script>
+                {% if indent.estimated_arrival and indent.estimated_arrival[i] %}
+                  <span class="badge bg-warning text-dark">
+                    {{ indent.estimated_arrival[i].strftime("%d-%b %I:%M %p") }}
+                  </span>
+                {% else %}
+                  <span class="badge bg-secondary text-dark">–</span>
+                {% endif %}
+              </li>
+            {% endfor %}
 
-</body>
-</html>
+          </ul>
+        </div>
+
+        <!-- TOTAL DISTANCE -->
+        <div class="col-md-2 text-center">
+          <h6>Total Distance</h6>
+          <p class="display-6 mb-0">{{ indent.total_distance }} km</p>
+        </div>
+
+        <!-- MAP BUTTON -->
+        <div class="col-md-1 d-flex align-items-center justify-content-center">
+          {% if indent.map_url %}
+            <a href="{{ indent.map_url }}" target="_blank" class="btn btn-sm btn-primary">Map</a>
+          {% else %}
+            <span class="text-muted">No Map</span>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="alert alert-info">No recent indents found for today or yesterday.</div>
+  {% endif %}
+</div>
+{% endblock %}
